@@ -31,7 +31,7 @@ export default function Home() {
                 href="/auth/register"
                 className="bg-orange-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-orange-600 transition"
               >
-                Get Started Free
+                Get Started
               </a>
             </div>
           </div>
@@ -55,8 +55,9 @@ export default function Home() {
             </h1>
             
             <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Track every throw, analyze your performance, and become the player you've always wanted to be. 
-              Join thousands of dart players already improving their game with Dartmaster.
+              Dartmaster is your personal darts companion. Track your games, monitor your progress, 
+              and analyze your performance to become a better player. Whether you're practicing alone 
+              or competing with friends, we help you master your game.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -64,15 +65,18 @@ export default function Home() {
                 href="/auth/register"
                 className="bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-orange-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                Start Free Trial →
+                Start Playing →
               </a>
-              <button className="bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg border-2 border-gray-200 hover:border-gray-300 transition">
-                Watch Demo
-              </button>
+              <a 
+                href="/auth/login"
+                className="bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg border-2 border-gray-200 hover:border-gray-300 transition"
+              >
+                Sign In
+              </a>
             </div>
 
             <p className="mt-8 text-sm text-gray-500">
-              No credit card required • 14-day free trial • Cancel anytime
+              Create your account and start tracking your darts journey
             </p>
           </div>
 
@@ -211,7 +215,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Create Your Account</h3>
               <p className="text-gray-600">
-                Sign up in seconds with just your email. No credit card required for the free trial.
+                Sign up in seconds with just your email and start tracking your darts journey.
               </p>
             </div>
 
@@ -320,21 +324,24 @@ export default function Home() {
           </h2>
           <p className="text-xl text-gray-300 mb-10">
             Join thousands of players already improving with Dartmaster. 
-            Start your free trial today.
+            Track your games, analyze your stats, and become a better player.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/auth/register"
               className="bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-orange-600 transition shadow-lg hover:shadow-xl"
             >
-              Start Free Trial →
+              Join Dartmaster →
             </a>
-            <button className="bg-transparent text-white px-8 py-4 rounded-lg font-semibold text-lg border-2 border-gray-700 hover:border-gray-600 transition">
-              Contact Sales
-            </button>
+            <a 
+              href="/auth/login"
+              className="bg-transparent text-white px-8 py-4 rounded-lg font-semibold text-lg border-2 border-gray-700 hover:border-gray-600 transition"
+            >
+              Sign In
+            </a>
           </div>
           <p className="mt-8 text-gray-400">
-            No credit card required • 14-day free trial • Cancel anytime
+            Start tracking • Improve your game • Connect with players
           </p>
         </div>
       </section>
@@ -344,27 +351,27 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Product</h4>
+              <h4 className="font-semibold text-gray-900 mb-4">Dartmaster</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Features</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Pricing</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">API</a></li>
+                <li><a href="/auth/register" className="text-gray-600 hover:text-gray-900">Get Started</a></li>
+                <li><a href="/auth/login" className="text-gray-600 hover:text-gray-900">Sign In</a></li>
+                <li><a href="/players" className="text-gray-600 hover:text-gray-900">Players</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Company</h4>
+              <h4 className="font-semibold text-gray-900 mb-4">Community</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">About</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Blog</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Careers</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900">Discord</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900">Forum</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900">Events</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Support</h4>
+              <h4 className="font-semibold text-gray-900 mb-4">Resources</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Help Center</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900">Help</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900">FAQ</a></li>
                 <li><a href="#" className="text-gray-600 hover:text-gray-900">Contact</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Status</a></li>
               </ul>
             </div>
             <div>
@@ -372,12 +379,12 @@ export default function Home() {
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-600 hover:text-gray-900">Privacy</a></li>
                 <li><a href="#" className="text-gray-600 hover:text-gray-900">Terms</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Cookie Policy</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900">Cookies</a></li>
               </ul>
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-gray-200 text-center text-gray-600">
-            <p>© 2024 Dartmaster. All rights reserved.</p>
+            <p>© 2024 Dartmaster - Made with 🎯 by dart enthusiasts</p>
           </div>
         </div>
       </footer>
