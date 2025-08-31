@@ -5,6 +5,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { GameProvider } from "@/contexts/GameContextV2";
 import { PracticeProvider } from "@/contexts/PracticeContext";
 import { UserProfileProvider } from "@/contexts/UserProfileContext";
+import { FriendsProvider } from "@/contexts/FriendsContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -16,11 +18,15 @@ export default function RootLayout({ children }) {
       <body>
         <AuthProvider>
           <UserProfileProvider>
-            <GameProvider>
-              <PracticeProvider>
-                {children}
-              </PracticeProvider>
-            </GameProvider>
+            <FriendsProvider>
+              <NotificationProvider>
+                <GameProvider>
+                  <PracticeProvider>
+                    {children}
+                  </PracticeProvider>
+                </GameProvider>
+              </NotificationProvider>
+            </FriendsProvider>
           </UserProfileProvider>
         </AuthProvider>
       </body>

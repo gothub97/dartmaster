@@ -20,27 +20,27 @@ const PRACTICE_MODES = {
   target: {
     name: "Target Practice",
     description: "Practice hitting specific numbers or segments",
-    icon: "🎯",
+    icon: "target",
   },
   checkout: {
     name: "Checkout Practice",
     description: "Practice finishing from specific scores",
-    icon: "🏁",
+    icon: "flag",
   },
   freePlay: {
     name: "Free Play",
     description: "Throw freely without constraints",
-    icon: "🎲",
+    icon: "sparkles",
   },
   aroundTheClock: {
     name: "Around the Clock",
     description: "Hit numbers in sequence from 1-20",
-    icon: "🕐",
+    icon: "clock",
   },
   cricket: {
     name: "Cricket Practice",
     description: "Practice cricket targets (20-15, Bull)",
-    icon: "🦗",
+    icon: "trophy",
   },
 };
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useUserProfile } from "@/contexts/UserProfileContext";
 import { databases } from "@/lib/appwrite";
 import { Query } from "appwrite";
+import FriendButton from "@/components/social/FriendButton";
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
 
@@ -171,15 +172,24 @@ export default function PublicProfilePage() {
               </div>
               
               <div className="ml-6 flex-1">
-                <h1 className="text-3xl font-bold text-white">
-                  @{profile.username}
-                </h1>
-                {profile.country && (
-                  <p className="text-gray-400 mt-1">📍 {profile.country}</p>
-                )}
-                {profile.club && (
-                  <p className="text-gray-400">🎯 {profile.club}</p>
-                )}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold text-white">
+                      @{profile.username}
+                    </h1>
+                    {profile.country && (
+                      <p className="text-gray-400 mt-1">📍 {profile.country}</p>
+                    )}
+                    {profile.club && (
+                      <p className="text-gray-400">🎯 {profile.club}</p>
+                    )}
+                  </div>
+                  
+                  {/* Friend Button */}
+                  <div className="mt-2">
+                    <FriendButton userId={profile.userId} />
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -145,7 +145,7 @@ export const UserProfileProvider = ({ children }) => {
       const response = await databases.createDocument(
         DATABASE_ID,
         PROFILES_COLLECTION,
-        ID.unique(),
+        user.$id,  // Use userId as document ID to prevent duplicates
         data
       );
 

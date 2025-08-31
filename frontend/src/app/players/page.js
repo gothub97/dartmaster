@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useUserProfile } from "@/contexts/UserProfileContext";
 import { useAuth } from "@/contexts/AuthContext";
+import FriendButton from "@/components/social/FriendButton";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 export default function PlayersPage() {
   const { user } = useAuth();
@@ -94,6 +96,8 @@ export default function PlayersPage() {
             </div>
             
             <div className="flex items-center space-x-4">
+              {user && <NotificationBell />}
+              
               {user ? (
                 <Link 
                   href="/profile"
@@ -165,39 +169,42 @@ export default function PlayersPage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {profiles.map((profile) => (
-                <Link
+                <div
                   key={profile.$id}
-                  href={`/players/${profile.username}`}
-                  className="group"
+                  className="bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-red-500/50 transition-all"
                 >
-                  <div className="bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-red-500/50 transition-all transform hover:scale-[1.02]">
-                    {/* Profile Header */}
-                    <div className="flex items-center mb-4">
-                      <div className="w-16 h-16 bg-black/60 rounded-xl overflow-hidden">
-                        {profile.avatarUrl ? (
-                          <img 
-                            src={profile.avatarUrl} 
-                            alt={profile.username}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500 to-purple-600">
-                            <span className="text-white text-2xl font-bold">
-                              {profile.username?.charAt(0).toUpperCase() || "?"}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="ml-4 flex-1">
-                        <h3 className="text-lg font-semibold text-white group-hover:text-red-400 transition">
+                  {/* Profile Header */}
+                  <div className="flex items-center mb-4">
+                    <div className="w-16 h-16 bg-black/60 rounded-xl overflow-hidden">
+                      {profile.avatarUrl ? (
+                        <img 
+                          src={profile.avatarUrl} 
+                          alt={profile.username}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500 to-purple-600">
+                          <span className="text-white text-2xl font-bold">
+                            {profile.username?.charAt(0).toUpperCase() || "?"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="ml-4 flex-1">
+                      <Link 
+                        href={`/players/${profile.username}`}
+                        className="hover:text-red-400 transition"
+                      >
+                        <h3 className="text-lg font-semibold text-white">
                           @{profile.username}
                         </h3>
-                        {profile.country && (
-                          <p className="text-sm text-gray-400">📍 {profile.country}</p>
-                        )}
-                      </div>
+                      </Link>
+                      {profile.country && (
+                        <p className="text-sm text-gray-400">📍 {profile.country}</p>
+                      )}
                     </div>
+                  </div>
 
                     {/* Bio */}
                     {profile.bio && (
@@ -230,16 +237,20 @@ export default function PlayersPage() {
                       </div>
                     )}
 
-                    {/* Club */}
-                    {profile.club && (
-                      <div className="mt-4 pt-4 border-t border-white/10">
-                        <p className="text-sm text-gray-400">
-                          🎯 {profile.club}
-                        </p>
-                      </div>
-                    )}
+                  {/* Club */}
+                  {profile.club && (
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <p className="text-sm text-gray-400">
+                        🎯 {profile.club}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Friend Button */}
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <FriendButton userId={profile.userId} className="w-full text-sm" />
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
 
