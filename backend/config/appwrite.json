@@ -1,0 +1,750 @@
+{
+  "projectId": "dartmaster-prod",
+  "projectName": "Dartmaster - Dart Performance Tracker",
+  "databases": [
+    {
+      "databaseId": "main",
+      "name": "Dartmaster Main Database",
+      "collections": [
+        {
+          "collectionId": "profiles",
+          "name": "User Profiles",
+          "permissions": [
+            "read(\"any\")",
+            "create(\"users\")",
+            "update(\"users\")",
+            "delete(\"users\")"
+          ],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "userId",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "displayName",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 128,
+              "default": null
+            },
+            {
+              "key": "bio",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 500,
+              "default": null
+            },
+            {
+              "key": "avatar",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "country",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 2,
+              "default": null
+            },
+            {
+              "key": "timezone",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 50,
+              "default": null
+            },
+            {
+              "key": "clubId",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "clubName",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 128,
+              "default": null
+            },
+            {
+              "key": "preferences",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 2048,
+              "default": "{\"theme\":\"light\",\"notifications\":{\"email\":true,\"push\":true,\"social\":true},\"privacy\":{\"profileVisibility\":\"public\",\"showStats\":true,\"showActivity\":true}}"
+            },
+            {
+              "key": "stats",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 1024,
+              "default": "{\"totalMatches\":0,\"totalPractice\":0,\"averageScore\":0.0,\"checkoutPercentage\":0.0,\"doublesPercentage\":0.0,\"total180s\":0,\"highestCheckout\":0,\"bestAverage\":0.0}"
+            },
+            {
+              "key": "isActive",
+              "type": "boolean",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "default": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "userId_unique",
+              "type": "unique",
+              "status": "available",
+              "error": "",
+              "attributes": ["userId"]
+            },
+            {
+              "key": "clubId_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["clubId"]
+            },
+            {
+              "key": "country_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["country"]
+            },
+            {
+              "key": "active_updated_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["isActive", "$updatedAt"]
+            }
+          ]
+        },
+        {
+          "collectionId": "sessions",
+          "name": "Enhanced Sessions",
+          "permissions": [
+            "read(\"users\")",
+            "create(\"users\")",
+            "update(\"users\")",
+            "delete(\"users\")"
+          ],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "userId",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "sessionId",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "deviceInfo",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 1024,
+              "default": null
+            },
+            {
+              "key": "location",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 256,
+              "default": null
+            },
+            {
+              "key": "rememberMe",
+              "type": "boolean",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "default": false
+            },
+            {
+              "key": "isActive",
+              "type": "boolean",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "default": true
+            },
+            {
+              "key": "lastActivity",
+              "type": "datetime",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "default": null
+            },
+            {
+              "key": "expiresAt",
+              "type": "datetime",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "default": null
+            }
+          ],
+          "indexes": [
+            {
+              "key": "sessionId_unique",
+              "type": "unique",
+              "status": "available",
+              "error": "",
+              "attributes": ["sessionId"]
+            },
+            {
+              "key": "userId_active_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["userId", "isActive"]
+            },
+            {
+              "key": "expires_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["expiresAt"]
+            }
+          ]
+        },
+        {
+          "collectionId": "clubs",
+          "name": "Clubs and Organizations",
+          "permissions": [
+            "read(\"any\")",
+            "create(\"users\")",
+            "update(\"users\")",
+            "delete(\"users\")"
+          ],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "name",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 128,
+              "default": null
+            },
+            {
+              "key": "description",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 1000,
+              "default": null
+            },
+            {
+              "key": "logo",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "country",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 2,
+              "default": null
+            },
+            {
+              "key": "address",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 512,
+              "default": null
+            },
+            {
+              "key": "contact",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 256,
+              "default": null
+            },
+            {
+              "key": "adminIds",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": true,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "memberCount",
+              "type": "integer",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "min": 0,
+              "max": 10000,
+              "default": 0
+            },
+            {
+              "key": "settings",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 512,
+              "default": "{\"isPublic\":true,\"requireApproval\":false,\"allowGuests\":true}"
+            },
+            {
+              "key": "isActive",
+              "type": "boolean",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "default": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "name_index",
+              "type": "fulltext",
+              "status": "available",
+              "error": "",
+              "attributes": ["name"]
+            },
+            {
+              "key": "country_active_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["country", "isActive"]
+            },
+            {
+              "key": "admin_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["adminIds"]
+            }
+          ]
+        },
+        {
+          "collectionId": "recovery_tokens",
+          "name": "Password Recovery Tokens",
+          "permissions": [],
+          "documentSecurity": false,
+          "attributes": [
+            {
+              "key": "userId",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "token",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 64,
+              "default": null
+            },
+            {
+              "key": "email",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 254,
+              "default": null
+            },
+            {
+              "key": "isUsed",
+              "type": "boolean",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "default": false
+            },
+            {
+              "key": "expiresAt",
+              "type": "datetime",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "default": null
+            },
+            {
+              "key": "usedAt",
+              "type": "datetime",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "default": null
+            }
+          ],
+          "indexes": [
+            {
+              "key": "token_unique",
+              "type": "unique",
+              "status": "available",
+              "error": "",
+              "attributes": ["token"]
+            },
+            {
+              "key": "userId_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["userId"]
+            },
+            {
+              "key": "expires_cleanup_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["expiresAt"]
+            }
+          ]
+        },
+        {
+          "collectionId": "audit_logs",
+          "name": "Security Audit Logs",
+          "permissions": [],
+          "documentSecurity": false,
+          "attributes": [
+            {
+              "key": "userId",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 36,
+              "default": null
+            },
+            {
+              "key": "action",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "size": 50,
+              "default": null
+            },
+            {
+              "key": "resource",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 100,
+              "default": null
+            },
+            {
+              "key": "details",
+              "type": "string",
+              "status": "available",
+              "error": "",
+              "required": false,
+              "array": false,
+              "size": 2048,
+              "default": null
+            },
+            {
+              "key": "timestamp",
+              "type": "datetime",
+              "status": "available",
+              "error": "",
+              "required": true,
+              "array": false,
+              "default": null
+            }
+          ],
+          "indexes": [
+            {
+              "key": "userId_timestamp_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["userId", "timestamp"]
+            },
+            {
+              "key": "action_timestamp_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["action", "timestamp"]
+            },
+            {
+              "key": "timestamp_cleanup_index",
+              "type": "key",
+              "status": "available",
+              "error": "",
+              "attributes": ["timestamp"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "storage": {
+    "buckets": [
+      {
+        "bucketId": "avatars",
+        "name": "User Avatars",
+        "permissions": [
+          "read(\"any\")",
+          "create(\"users\")",
+          "update(\"users\")",
+          "delete(\"users\")"
+        ],
+        "fileSecurity": true,
+        "enabled": true,
+        "maximumFileSize": 2097152,
+        "allowedFileExtensions": ["jpg", "jpeg", "png", "webp"],
+        "compression": "gzip",
+        "encryption": true,
+        "antivirus": true
+      },
+      {
+        "bucketId": "club_logos",
+        "name": "Club Logos",
+        "permissions": [
+          "read(\"any\")",
+          "create(\"users\")",
+          "update(\"users\")",
+          "delete(\"users\")"
+        ],
+        "fileSecurity": true,
+        "enabled": true,
+        "maximumFileSize": 1048576,
+        "allowedFileExtensions": ["jpg", "jpeg", "png", "svg", "webp"],
+        "compression": "gzip",
+        "encryption": true,
+        "antivirus": true
+      }
+    ]
+  },
+  "functions": [
+    {
+      "functionId": "auth-handler",
+      "name": "Authentication Handler",
+      "runtime": "node-18.0",
+      "execute": ["users"],
+      "events": [
+        "users.*.create",
+        "users.*.sessions.*.create",
+        "users.*.sessions.*.delete"
+      ],
+      "schedule": "",
+      "timeout": 30,
+      "enabled": true,
+      "logging": true,
+      "entrypoint": "src/main.js",
+      "commands": "npm install",
+      "ignore": [".git", "node_modules", ".appwrite"]
+    },
+    {
+      "functionId": "profile-manager",
+      "name": "Profile Management",
+      "runtime": "node-18.0",
+      "execute": ["users"],
+      "events": [],
+      "schedule": "",
+      "timeout": 30,
+      "enabled": true,
+      "logging": true,
+      "entrypoint": "src/main.js",
+      "commands": "npm install",
+      "ignore": [".git", "node_modules", ".appwrite"]
+    },
+    {
+      "functionId": "password-recovery",
+      "name": "Password Recovery Handler",
+      "runtime": "node-18.0",
+      "execute": ["any"],
+      "events": [],
+      "schedule": "",
+      "timeout": 30,
+      "enabled": true,
+      "logging": true,
+      "entrypoint": "src/main.js",
+      "commands": "npm install",
+      "ignore": [".git", "node_modules", ".appwrite"]
+    },
+    {
+      "functionId": "session-cleanup",
+      "name": "Session Cleanup",
+      "runtime": "node-18.0",
+      "execute": ["any"],
+      "events": [],
+      "schedule": "0 2 * * *",
+      "timeout": 60,
+      "enabled": true,
+      "logging": true,
+      "entrypoint": "src/main.js",
+      "commands": "npm install",
+      "ignore": [".git", "node_modules", ".appwrite"]
+    }
+  ],
+  "settings": {
+    "services": {
+      "account": {
+        "enabled": true
+      },
+      "avatars": {
+        "enabled": true
+      },
+      "databases": {
+        "enabled": true
+      },
+      "locale": {
+        "enabled": true
+      },
+      "health": {
+        "enabled": true
+      },
+      "storage": {
+        "enabled": true
+      },
+      "teams": {
+        "enabled": true
+      },
+      "users": {
+        "enabled": true
+      },
+      "functions": {
+        "enabled": true
+      },
+      "messaging": {
+        "enabled": true
+      }
+    },
+    "auth": {
+      "methods": {
+        "emailPassword": {
+          "enabled": true
+        },
+        "magicURL": {
+          "enabled": false
+        },
+        "emailOTP": {
+          "enabled": false
+        },
+        "smsOTP": {
+          "enabled": false
+        },
+        "phoneOTP": {
+          "enabled": false
+        },
+        "anonymous": {
+          "enabled": false
+        },
+        "invites": {
+          "enabled": true
+        },
+        "jwt": {
+          "enabled": true
+        }
+      },
+      "security": {
+        "duration": 31536000,
+        "limit": 0,
+        "sessionsLimit": 10,
+        "passwordHistory": 6,
+        "passwordDictionary": true,
+        "personalDataCheck": true
+      }
+    }
+  }
+}
