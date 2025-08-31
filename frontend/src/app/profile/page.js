@@ -771,10 +771,16 @@ export default function ProfilePage() {
                 <h3 className="font-semibold text-gray-900 mb-3">Share Your Profile</h3>
                 <div className="bg-gray-50 rounded-lg p-3">
                   <p className="text-sm text-gray-600 break-all">
-                    dartmaster.app/players/{profile.username}
+                    https://dartmaster.appwrite.network/players/{profile.username}
                   </p>
                 </div>
-                <button className="w-full mt-3 px-4 py-2 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition text-sm font-medium">
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://dartmaster.appwrite.network/players/${profile.username}`);
+                    alert('Profile link copied to clipboard!');
+                  }}
+                  className="w-full mt-3 px-4 py-2 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition text-sm font-medium"
+                >
                   Copy Link
                 </button>
               </div>
