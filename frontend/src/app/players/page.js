@@ -6,6 +6,7 @@ import { useUserProfile } from "@/contexts/UserProfileContext";
 import { useAuth } from "@/contexts/AuthContext";
 import FriendButton from "@/components/social/FriendButton";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import ProfileButton from "@/components/layout/ProfileButton";
 
 export default function PlayersPage() {
   const { user } = useAuth();
@@ -67,67 +68,77 @@ export default function PlayersPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="relative z-10 bg-black/20 backdrop-blur-lg border-b border-white/10">
+      <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
-              <Link href={user ? "/dashboard" : "/"} className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
-                  <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+              <Link href={user ? "/dashboard" : "/"} className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
                 </div>
-                <span className="font-bold text-xl text-white">Dartmaster</span>
+                <span className="font-bold text-xl text-gray-900">Dartmaster</span>
               </Link>
               
               {user && (
-                <div className="hidden md:flex space-x-4">
-                  <Link href="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                <nav className="hidden md:flex space-x-6">
+                  <Link href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
                     Dashboard
                   </Link>
-                  <Link href="/play" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                  <Link href="/play" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
                     Play
                   </Link>
-                  <Link href="/players" className="text-white hover:text-red-400 px-3 py-2 rounded-md text-sm font-medium transition">
+                  <Link href="/practice" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                    Practice
+                  </Link>
+                  <Link href="/activities" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                    Activities
+                  </Link>
+                  <Link href="/players" className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1">
                     Players
                   </Link>
-                </div>
+                </nav>
               )}
             </div>
             
             <div className="flex items-center space-x-4">
-              {user && <NotificationBell />}
-              
               {user ? (
-                <Link 
-                  href="/profile"
-                  className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm font-medium transition border border-red-500/30"
-                >
-                  My Profile
-                </Link>
+                <>
+                  <NotificationBell />
+                  <ProfileButton />
+                </>
               ) : (
-                <Link 
-                  href="/auth/login"
-                  className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm font-medium transition border border-red-500/30"
-                >
-                  Sign In
-                </Link>
+                <div className="flex items-center space-x-3">
+                  <Link 
+                    href="/auth/login"
+                    className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition"
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    href="/auth/register"
+                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition"
+                  >
+                    Get Started
+                  </Link>
+                </div>
               )}
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">Discover Players</h1>
-          <p className="text-gray-400 text-lg">Find and connect with dart players from around the world</p>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Discover Players</h1>
+          <p className="text-gray-600 text-lg">Find and connect with dart players from around the world</p>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-8">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
@@ -136,7 +147,7 @@ export default function PlayersPage() {
                   placeholder="Search by username..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                 />
               </div>
               
@@ -144,7 +155,7 @@ export default function PlayersPage() {
                 name="country"
                 value={filters.country}
                 onChange={handleFilterChange}
-                className="px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 transition"
+                className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               >
                 <option value="">All Countries</option>
                 {countries.map(country => (
@@ -154,7 +165,7 @@ export default function PlayersPage() {
               
               <button
                 type="submit"
-                className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+                className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition"
               >
                 Search
               </button>
@@ -164,18 +175,20 @@ export default function PlayersPage() {
 
         {/* Players Grid */}
         {loading ? (
-          <div className="text-center text-white">Loading players...</div>
+          <div className="flex justify-center items-center py-12">
+            <div className="w-8 h-8 border-2 border-gray-300 rounded-full animate-spin border-t-orange-500"></div>
+          </div>
         ) : profiles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {profiles.map((profile) => (
                 <div
                   key={profile.$id}
-                  className="bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-red-500/50 transition-all"
+                  className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all"
                 >
                   {/* Profile Header */}
                   <div className="flex items-center mb-4">
-                    <div className="w-16 h-16 bg-black/60 rounded-xl overflow-hidden">
+                    <div className="w-16 h-16 bg-white rounded-full overflow-hidden border-2 border-gray-200">
                       {profile.avatarUrl ? (
                         <img 
                           src={profile.avatarUrl} 
@@ -183,8 +196,8 @@ export default function PlayersPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500 to-purple-600">
-                          <span className="text-white text-2xl font-bold">
+                        <div className="w-full h-full flex items-center justify-center bg-orange-100">
+                          <span className="text-orange-600 text-2xl font-bold">
                             {profile.username?.charAt(0).toUpperCase() || "?"}
                           </span>
                         </div>
@@ -194,61 +207,69 @@ export default function PlayersPage() {
                     <div className="ml-4 flex-1">
                       <Link 
                         href={`/players/${profile.username}`}
-                        className="hover:text-red-400 transition"
+                        className="hover:text-orange-600 transition"
                       >
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="text-lg font-semibold text-gray-900">
                           @{profile.username}
                         </h3>
                       </Link>
                       {profile.country && (
-                        <p className="text-sm text-gray-400">📍 {profile.country}</p>
+                        <p className="text-sm text-gray-600">📍 {profile.country}</p>
                       )}
                     </div>
                   </div>
 
-                    {/* Bio */}
-                    {profile.bio && (
-                      <p className="text-gray-300 text-sm mb-4 line-clamp-2">
-                        {profile.bio}
-                      </p>
-                    )}
+                  {/* Bio */}
+                  {profile.bio && (
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {profile.bio}
+                    </p>
+                  )}
 
-                    {/* Stats */}
-                    {profile.stats && (
-                      <div className="flex justify-between text-center">
-                        <div>
-                          <div className="text-xl font-bold text-red-500">
-                            {profile.stats.gamesPlayed || 0}
-                          </div>
-                          <div className="text-xs text-gray-500">Games</div>
+                  {/* Stats */}
+                  {profile.stats && (
+                    <div className="grid grid-cols-3 gap-2 text-center mb-4">
+                      <div className="bg-gray-50 rounded-lg p-2">
+                        <div className="text-xl font-bold text-orange-500">
+                          {profile.stats.gamesPlayed || 0}
                         </div>
-                        <div>
-                          <div className="text-xl font-bold text-green-500">
-                            {profile.stats.wins || 0}
-                          </div>
-                          <div className="text-xs text-gray-500">Wins</div>
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-yellow-500">
-                            {profile.stats.winRate || 0}%
-                          </div>
-                          <div className="text-xs text-gray-500">Win Rate</div>
-                        </div>
+                        <div className="text-xs text-gray-600">Games</div>
                       </div>
-                    )}
+                      <div className="bg-gray-50 rounded-lg p-2">
+                        <div className="text-xl font-bold text-green-600">
+                          {profile.stats.wins || 0}
+                        </div>
+                        <div className="text-xs text-gray-600">Wins</div>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-2">
+                        <div className="text-xl font-bold text-yellow-600">
+                          {profile.stats.winRate || 0}%
+                        </div>
+                        <div className="text-xs text-gray-600">Win Rate</div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Club */}
                   {profile.club && (
-                    <div className="mt-4 pt-4 border-t border-white/10">
-                      <p className="text-sm text-gray-400">
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-600">
                         🎯 {profile.club}
                       </p>
                     </div>
                   )}
 
-                  {/* Friend Button */}
-                  <div className="mt-4 pt-4 border-t border-white/10">
-                    <FriendButton userId={profile.userId} className="w-full text-sm" />
+                  {/* Action Buttons */}
+                  <div className="mt-4 pt-4 border-t border-gray-200 flex gap-2">
+                    <Link
+                      href={`/players/${profile.username}`}
+                      className="flex-1 text-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition"
+                    >
+                      View Profile
+                    </Link>
+                    {user && (
+                      <FriendButton userId={profile.userId} className="flex-1 text-sm" />
+                    )}
                   </div>
                 </div>
               ))}
@@ -260,7 +281,7 @@ export default function PlayersPage() {
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                   disabled={pagination.page === 1}
-                  className="px-4 py-2 bg-black/40 border border-white/10 rounded-lg text-white hover:bg-black/60 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
@@ -274,8 +295,8 @@ export default function PlayersPage() {
                         onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
                         className={`w-10 h-10 rounded-lg transition ${
                           pagination.page === pageNum
-                            ? "bg-red-600 text-white"
-                            : "bg-black/40 border border-white/10 text-white hover:bg-black/60"
+                            ? "bg-orange-500 text-white"
+                            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                         }`}
                       >
                         {pageNum}
@@ -290,8 +311,8 @@ export default function PlayersPage() {
                         onClick={() => setPagination(prev => ({ ...prev, page: totalPages }))}
                         className={`w-10 h-10 rounded-lg transition ${
                           pagination.page === totalPages
-                            ? "bg-red-600 text-white"
-                            : "bg-black/40 border border-white/10 text-white hover:bg-black/60"
+                            ? "bg-orange-500 text-white"
+                            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                         }`}
                       >
                         {totalPages}
@@ -303,7 +324,7 @@ export default function PlayersPage() {
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
                   disabled={pagination.page === totalPages}
-                  className="px-4 py-2 bg-black/40 border border-white/10 rounded-lg text-white hover:bg-black/60 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -311,16 +332,18 @@ export default function PlayersPage() {
             )}
           </>
         ) : (
-          <div className="text-center">
-            <p className="text-gray-400 text-lg mb-4">No players found</p>
-            {!user && (
-              <Link
-                href="/auth/register"
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transition"
-              >
-                Be the First to Join!
-              </Link>
-            )}
+          <div className="text-center py-12">
+            <div className="bg-white rounded-lg border border-gray-200 p-12 max-w-md mx-auto">
+              <p className="text-gray-600 text-lg mb-6">No players found</p>
+              {!user && (
+                <Link
+                  href="/auth/register"
+                  className="inline-flex items-center px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition"
+                >
+                  Be the First to Join!
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>
