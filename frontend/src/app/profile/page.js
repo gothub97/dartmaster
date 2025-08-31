@@ -1,395 +1,631 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
-import Card from "@/components/ui/Card";
-import Alert from "@/components/ui/Alert";
-import { validateForm } from "@/utils/validation";
+import { useUserProfile } from "@/contexts/UserProfileContext";
+import { useGame } from "@/contexts/GameContextV2";
 
-const AvatarUpload = ({ currentAvatar, onAvatarChange }) => {
-  const [preview, setPreview] = useState(currentAvatar || "");
+export default function ProfilePage() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const { 
+    profile, 
+    loading: profileLoading, 
+    createProfile, 
+    updateProfile, 
+    uploadAvatar,
+    checkUsernameAvailability,
+    calculateUserStats 
+  } = useUserProfile();
+  const { activeMatches } = useGame();
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [isNewProfile, setIsNewProfile] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    bio: "",
+    country: "",
+    club: "",
+    visibility: "public",
+    socialLinks: {
+      twitter: "",
+      instagram: "",
+      facebook: ""
+    }
+  });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleFileChange = (e) => {
+  // Check if user needs to create profile
+  useEffect(() => {
+    console.log("Profile check - authLoading:", authLoading, "profileLoading:", profileLoading, "user:", user?.$id, "profile:", profile?.$id);
+    
+    if (!authLoading && !profileLoading) {
+      if (user && !profile) {
+        console.log("Setting up new profile for user");
+        setIsNewProfile(true);
+        setIsEditing(true);
+      } else if (profile) {
+        setFormData({
+          username: profile.username || "",
+          bio: profile.bio || "",
+          country: profile.country || "",
+          club: profile.club || "",
+          visibility: profile.visibility || "public",
+          socialLinks: profile.socialLinks || {
+            twitter: "",
+            instagram: "",
+            facebook: ""
+          }
+        });
+        setAvatarPreview(profile.avatarUrl);
+      }
+    }
+  }, [user, profile, authLoading, profileLoading]);
+
+  // Load user statistics
+  useEffect(() => {
+    const loadStats = async () => {
+      if (user) {
+        setLoadingStats(true);
+        const userStats = await calculateUserStats(user.$id);
+        setStats(userStats);
+        setLoadingStats(false);
+      }
+    };
+    loadStats();
+  }, [user, calculateUserStats]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [user, authLoading, router]);
+
+  // Check username availability with debounce
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (formData.username && formData.username.length >= 3) {
+        if (profile && formData.username === profile.username) {
+          setUsernameAvailable(true);
+          return;
+        }
+        
+        setCheckingUsername(true);
+        const available = await checkUsernameAvailability(formData.username);
+        setUsernameAvailable(available);
+        setCheckingUsername(false);
+      } else {
+        setUsernameAvailable(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.username, checkUsernameAvailability, profile]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name.startsWith("social_")) {
+      const socialKey = name.replace("social_", "");
+      setFormData(prev => ({
+        ...prev,
+        socialLinks: {
+          ...prev.socialLinks,
+          [socialKey]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type and size
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+      // Validate file
+      if (!file.type.startsWith("image/")) {
+        setError("Please select an image file");
         return;
       }
       
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        alert('File size must be less than 5MB');
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image must be less than 5MB");
         return;
       }
-
+      
+      setAvatarFile(file);
+      
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result);
-        onAvatarChange(file);
+        setAvatarPreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  return (
-    <div className="flex flex-col items-center space-y-4">
-      <div className="relative group">
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 border-4 border-white dark:border-gray-800 shadow-lg">
-          {preview ? (
-            <img
-              src={preview}
-              alt="Profile avatar"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-          )}
-        </div>
-        <label className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-        </label>
-      </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-        Click to upload avatar<br />
-        Max 5MB, JPG/PNG only
-      </p>
-    </div>
-  );
-};
-
-const ProfileStats = ({ user }) => {
-  const stats = [
-    { label: "Games Played", value: user?.prefs?.stats?.gamesPlayed || 0 },
-    { label: "Wins", value: user?.prefs?.stats?.wins || 0 },
-    { label: "Average Score", value: user?.prefs?.stats?.averageScore || 0 },
-    { label: "Best Finish", value: user?.prefs?.stats?.bestFinish || "-" }
-  ];
-
-  return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat, index) => (
-        <div key={index} className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-            {stat.value}
-          </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            {stat.label}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const ProfilePage = () => {
-  const { user, updateProfile } = useAuth();
-  
-  const [formData, setFormData] = useState({
-    name: "",
-    bio: "",
-    country: "",
-    club: "",
-    avatar: null
-  });
-  
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
-
-  // Initialize form with user data
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || "",
-        bio: user.prefs?.bio || "",
-        country: user.prefs?.country || "",
-        club: user.prefs?.club || "",
-        avatar: null
-      });
-    }
-  }, [user]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleAvatarChange = (file) => {
-    setFormData(prev => ({
-      ...prev,
-      avatar: file
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAlert(null);
-    
-    // Validation rules
-    const rules = {
-      name: { required: true, type: "name", label: "Name" },
-      bio: {
-        validator: (value) => {
-          if (value && value.length > 500) {
-            return { isValid: false, error: "Bio must be less than 500 characters" };
-          }
-          return { isValid: true };
+    setError("");
+    setSaving(true);
+
+    try {
+      // Validate username
+      if (!formData.username || formData.username.length < 3) {
+        setError("Username must be at least 3 characters");
+        setSaving(false);
+        return;
+      }
+
+      if (usernameAvailable === false) {
+        setError("Username is already taken");
+        setSaving(false);
+        return;
+      }
+
+      let result;
+      
+      if (isNewProfile) {
+        // Create new profile
+        result = await createProfile(formData);
+      } else {
+        // Update existing profile
+        result = await updateProfile(formData);
+      }
+
+      if (!result.success) {
+        setError(result.error || "Failed to save profile");
+        setSaving(false);
+        return;
+      }
+
+      // Upload avatar if changed
+      if (avatarFile) {
+        const avatarResult = await uploadAvatar(avatarFile);
+        if (!avatarResult.success) {
+          setError("Profile saved but avatar upload failed");
         }
       }
-    };
 
-    const validation = validateForm(formData, rules);
-    
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
-    }
-
-    setLoading(true);
-    
-    try {
-      // Prepare preferences object
-      const prefs = {
-        ...user.prefs,
-        bio: formData.bio,
-        country: formData.country,
-        club: formData.club
-      };
-
-      // TODO: Handle avatar upload to Appwrite Storage
-      // For now, we'll skip avatar upload implementation
-      if (formData.avatar) {
-        console.log("Avatar upload will be implemented with Appwrite Storage");
-      }
-
-      const result = await updateProfile(formData.name, prefs);
-      
-      if (result.success) {
-        setAlert({
-          type: "success",
-          message: "Profile updated successfully!"
-        });
-      } else {
-        setAlert({
-          type: "error",
-          message: result.error || "Failed to update profile. Please try again."
-        });
-      }
-    } catch (error) {
-      console.error("Profile update error:", error);
-      setAlert({
-        type: "error",
-        message: "An unexpected error occurred. Please try again."
-      });
+      setIsEditing(false);
+      setIsNewProfile(false);
+      setAvatarFile(null);
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      setError("An unexpected error occurred");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
+  if (authLoading || profileLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   const countries = [
-    "United States", "United Kingdom", "Canada", "Australia", "Germany", 
+    "United States", "United Kingdom", "Canada", "Australia", "Germany",
     "Netherlands", "Belgium", "Ireland", "New Zealand", "South Africa",
-    // Add more countries as needed
+    "France", "Spain", "Italy", "Sweden", "Norway", "Denmark"
   ];
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto p-6">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Profile Settings
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Manage your account settings and dartboard preferences
-            </p>
-          </div>
-
-          {alert && (
-            <Alert 
-              variant={alert.type} 
-              className="mb-6"
-              onClose={() => setAlert(null)}
-            >
-              {alert.message}
-            </Alert>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Profile Form */}
-            <div className="lg:col-span-2">
-              <Card>
-                <Card.Header>
-                  <Card.Title>Personal Information</Card.Title>
-                  <Card.Description>
-                    Update your profile information and preferences
-                  </Card.Description>
-                </Card.Header>
-                
-                <Card.Content>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="flex flex-col lg:flex-row lg:space-x-6 space-y-6 lg:space-y-0">
-                      <div className="flex-shrink-0">
-                        <AvatarUpload
-                          currentAvatar={user?.prefs?.avatarUrl}
-                          onAvatarChange={handleAvatarChange}
-                        />
-                      </div>
-                      
-                      <div className="flex-1 space-y-4">
-                        <Input
-                          label="Full Name"
-                          name="name"
-                          type="text"
-                          placeholder="Enter your full name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          error={errors.name}
-                          required
-                        />
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Bio
-                          </label>
-                          <textarea
-                            name="bio"
-                            rows={3}
-                            placeholder="Tell us about yourself..."
-                            value={formData.bio}
-                            onChange={handleChange}
-                            className="block w-full px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
-                          />
-                          {errors.bio && (
-                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                              {errors.bio}
-                            </p>
-                          )}
-                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            {formData.bio.length}/500 characters
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Country
-                        </label>
-                        <select
-                          name="country"
-                          value={formData.country}
-                          onChange={handleChange}
-                          className="block w-full px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
-                        >
-                          <option value="">Select a country</option>
-                          {countries.map((country) => (
-                            <option key={country} value={country}>
-                              {country}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <Input
-                        label="Club Affiliation"
-                        name="club"
-                        type="text"
-                        placeholder="Your dart club (optional)"
-                        value={formData.club}
-                        onChange={handleChange}
-                        error={errors.club}
-                      />
-                    </div>
-
-                    <div className="flex justify-end">
-                      <Button
-                        type="submit"
-                        variant="primary"
-                        loading={loading}
-                        disabled={loading}
-                      >
-                        {loading ? "Saving..." : "Save Changes"}
-                      </Button>
-                    </div>
-                  </form>
-                </Card.Content>
-              </Card>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      {/* Navigation */}
+      <nav className="relative z-10 bg-black/20 backdrop-blur-lg border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-8">
+              <Link href="/dashboard" className="flex items-center space-x-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
+                  <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                </div>
+                <span className="font-bold text-xl text-white">Dartmaster</span>
+              </Link>
             </div>
-
-            {/* Stats Sidebar */}
-            <div className="space-y-6">
-              <Card>
-                <Card.Header>
-                  <Card.Title>Account Info</Card.Title>
-                </Card.Header>
-                <Card.Content>
-                  <div className="space-y-3 text-sm">
-                    <div>
-                      <span className="text-gray-500 dark:text-gray-400">Email:</span>
-                      <div className="font-medium">{user?.email}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 dark:text-gray-400">Member since:</span>
-                      <div className="font-medium">
-                        {user?.$createdAt ? new Date(user.$createdAt).toLocaleDateString() : "N/A"}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 dark:text-gray-400">Email verified:</span>
-                      <div className="flex items-center">
-                        {user?.emailVerification ? (
-                          <span className="text-green-600 dark:text-green-400">✓ Verified</span>
-                        ) : (
-                          <span className="text-yellow-600 dark:text-yellow-400">⚠ Pending</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Card.Content>
-              </Card>
-
-              <Card>
-                <Card.Header>
-                  <Card.Title>Game Statistics</Card.Title>
-                  <Card.Description>Your dart game performance</Card.Description>
-                </Card.Header>
-                <Card.Content>
-                  <ProfileStats user={user} />
-                </Card.Content>
-              </Card>
+            
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/dashboard"
+                className="px-4 py-2 text-gray-300 hover:text-white transition"
+              >
+                Back to Dashboard
+              </Link>
             </div>
           </div>
         </div>
-      </div>
-    </ProtectedRoute>
-  );
-};
+      </nav>
 
-export default ProfilePage;
+      {/* Main Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Profile Header */}
+        <div className="bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden mb-8">
+          {/* Background Banner */}
+          <div className="h-48 bg-gradient-to-r from-red-600/20 to-purple-600/20"></div>
+          
+          {/* Profile Info */}
+          <div className="px-8 pb-8">
+            <div className="flex items-end -mt-16 mb-6">
+              {/* Avatar */}
+              <div className="relative">
+                <div className="w-32 h-32 bg-black/60 rounded-2xl border-4 border-black/40 overflow-hidden">
+                  {avatarPreview ? (
+                    <img 
+                      src={avatarPreview} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500 to-purple-600">
+                      <span className="text-white text-4xl font-bold">
+                        {user.name?.charAt(0) || user.email?.charAt(0) || "?"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                {isEditing && (
+                  <label className="absolute bottom-0 right-0 w-10 h-10 bg-red-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-700 transition">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+              
+              <div className="ml-6 flex-1">
+                <h1 className="text-3xl font-bold text-white">
+                  {profile?.username ? `@${profile.username}` : user.name || "Player"}
+                </h1>
+                <p className="text-gray-400">{user.email}</p>
+                {profile?.country && (
+                  <p className="text-gray-400 mt-1">📍 {profile.country}</p>
+                )}
+              </div>
+              
+              {!isEditing && profile && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+                >
+                  Edit Profile
+                </button>
+              )}
+            </div>
+
+            {/* Form or Display */}
+            {isEditing ? (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-400">
+                    {error}
+                  </div>
+                )}
+
+                {/* Username Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Username *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleInputChange}
+                      placeholder="Choose a unique username"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition"
+                      required
+                    />
+                    {checkingUsername && (
+                      <div className="absolute right-3 top-3.5 text-gray-400">
+                        Checking...
+                      </div>
+                    )}
+                    {!checkingUsername && usernameAvailable === true && formData.username && (
+                      <div className="absolute right-3 top-3.5 text-green-400">
+                        ✓ Available
+                      </div>
+                    )}
+                    {!checkingUsername && usernameAvailable === false && (
+                      <div className="absolute right-3 top-3.5 text-red-400">
+                        ✗ Taken
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bio */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Bio
+                  </label>
+                  <textarea
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    placeholder="Tell us about yourself..."
+                    rows={3}
+                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition"
+                  />
+                </div>
+
+                {/* Country and Club */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Country
+                    </label>
+                    <select
+                      name="country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 transition"
+                    >
+                      <option value="">Select a country</option>
+                      {countries.map(country => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Club
+                    </label>
+                    <input
+                      type="text"
+                      name="club"
+                      value={formData.club}
+                      onChange={handleInputChange}
+                      placeholder="Your dart club"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Visibility */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Profile Visibility
+                  </label>
+                  <select
+                    name="visibility"
+                    value={formData.visibility}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 transition"
+                  >
+                    <option value="public">Public - Anyone can view</option>
+                    <option value="friends">Friends Only</option>
+                    <option value="private">Private - Only you</option>
+                  </select>
+                </div>
+
+                {/* Social Links */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Social Links
+                  </label>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      name="social_twitter"
+                      value={formData.socialLinks.twitter}
+                      onChange={handleInputChange}
+                      placeholder="Twitter username"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition"
+                    />
+                    <input
+                      type="text"
+                      name="social_instagram"
+                      value={formData.socialLinks.instagram}
+                      onChange={handleInputChange}
+                      placeholder="Instagram username"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition"
+                    />
+                    <input
+                      type="text"
+                      name="social_facebook"
+                      value={formData.socialLinks.facebook}
+                      onChange={handleInputChange}
+                      placeholder="Facebook username"
+                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-4">
+                  {!isNewProfile && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setError("");
+                        // Reset form
+                        setFormData({
+                          username: profile.username || "",
+                          bio: profile.bio || "",
+                          country: profile.country || "",
+                          club: profile.club || "",
+                          visibility: profile.visibility || "public",
+                          socialLinks: profile.socialLinks || {
+                            twitter: "",
+                            instagram: "",
+                            facebook: ""
+                          }
+                        });
+                        setAvatarPreview(profile.avatarUrl);
+                        setAvatarFile(null);
+                      }}
+                      className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  
+                  <button
+                    type="submit"
+                    disabled={saving || checkingUsername || usernameAvailable === false}
+                    className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {saving ? "Saving..." : isNewProfile ? "Create Profile" : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                {/* Bio */}
+                {profile?.bio && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">About</h3>
+                    <p className="text-white">{profile.bio}</p>
+                  </div>
+                )}
+
+                {/* Info Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {profile?.club && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-400 mb-1">Club</h3>
+                      <p className="text-white">{profile.club}</p>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-1">Member Since</h3>
+                    <p className="text-white">
+                      {new Date(user.$createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-1">Profile Status</h3>
+                    <p className="text-white capitalize">{profile?.visibility || "Public"}</p>
+                  </div>
+                </div>
+
+                {/* Social Links */}
+                {profile?.socialLinks && Object.keys(profile.socialLinks).some(key => profile.socialLinks[key]) && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">Social</h3>
+                    <div className="flex space-x-4">
+                      {profile.socialLinks.twitter && (
+                        <a
+                          href={`https://twitter.com/${profile.socialLinks.twitter}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 transition"
+                        >
+                          Twitter
+                        </a>
+                      )}
+                      {profile.socialLinks.instagram && (
+                        <a
+                          href={`https://instagram.com/${profile.socialLinks.instagram}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-pink-400 hover:text-pink-300 transition"
+                        >
+                          Instagram
+                        </a>
+                      )}
+                      {profile.socialLinks.facebook && (
+                        <a
+                          href={`https://facebook.com/${profile.socialLinks.facebook}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:text-blue-400 transition"
+                        >
+                          Facebook
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Statistics */}
+        <div className="bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Game Statistics</h2>
+          
+          {loadingStats ? (
+            <div className="text-center text-gray-400">Loading statistics...</div>
+          ) : stats ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-red-500">{stats.gamesPlayed}</div>
+                <div className="text-sm text-gray-400 mt-1">Games Played</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-500">{stats.wins}</div>
+                <div className="text-sm text-gray-400 mt-1">Wins</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-yellow-500">{stats.winRate}%</div>
+                <div className="text-sm text-gray-400 mt-1">Win Rate</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-500">{stats.averageScore}</div>
+                <div className="text-sm text-gray-400 mt-1">Avg Score</div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center text-gray-400">
+              <p>No statistics available yet</p>
+              <Link 
+                href="/play"
+                className="inline-flex items-center mt-4 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+              >
+                Play Your First Game
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Public Profile Link */}
+        {profile?.username && profile?.visibility === "public" && (
+          <div className="mt-8 text-center">
+            <p className="text-gray-400 mb-2">Share your profile</p>
+            <Link
+              href={`/players/${profile.username}`}
+              className="text-red-400 hover:text-red-300 transition"
+            >
+              dartmaster.app/players/{profile.username}
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

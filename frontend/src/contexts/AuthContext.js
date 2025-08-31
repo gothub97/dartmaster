@@ -71,7 +71,10 @@ export const AuthProvider = ({ children }) => {
       const currentUser = await account.get();
       setUser(currentUser);
       
-      return { success: true, user: currentUser };
+      // Note: Profile creation will be handled in the profile setup flow
+      // This allows users to choose their username after registration
+      
+      return { success: true, user: currentUser, needsProfile: true };
     } catch (error) {
       console.error("Registration error:", error);
       

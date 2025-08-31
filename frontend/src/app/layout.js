@@ -2,7 +2,9 @@
 
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { GameProvider } from "@/contexts/GameContext";
+import { GameProvider } from "@/contexts/GameContextV2";
+import { PracticeProvider } from "@/contexts/PracticeContext";
+import { UserProfileProvider } from "@/contexts/UserProfileContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -13,9 +15,13 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AuthProvider>
-          <GameProvider>
-            {children}
-          </GameProvider>
+          <UserProfileProvider>
+            <GameProvider>
+              <PracticeProvider>
+                {children}
+              </PracticeProvider>
+            </GameProvider>
+          </UserProfileProvider>
         </AuthProvider>
       </body>
     </html>

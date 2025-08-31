@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import ProfileButton from "@/components/layout/ProfileButton";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -70,11 +71,14 @@ export default function DashboardPage() {
                 <Link href="/play" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
                   Play
                 </Link>
-                <Link href="/stats" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
-                  Statistics
+                <Link href="/practice" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                  Practice
                 </Link>
-                <Link href="/leaderboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
-                  Leaderboard
+                <Link href="/players" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                  Players
+                </Link>
+                <Link href="/profile" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                  Profile
                 </Link>
               </div>
             </div>
@@ -84,6 +88,10 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-400">Welcome back,</p>
                 <p className="text-sm font-semibold text-white">{user.name || user.email}</p>
               </div>
+              
+              {/* Profile Button with Avatar */}
+              <ProfileButton />
+              
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm font-medium transition border border-red-500/30"
@@ -126,16 +134,34 @@ export default function DashboardPage() {
             </div>
           </Link>
 
+          <Link href="/matches" className="group">
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-yellow-500/50 transition-all transform hover:scale-[1.02]">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Active Matches</h3>
+              <p className="text-gray-400 text-sm">Resume your ongoing matches</p>
+              <div className="mt-4 text-yellow-400 group-hover:text-yellow-300 flex items-center text-sm font-medium">
+                View Matches
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </Link>
+
           <Link href="/practice" className="group">
-            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-green-500/50 transition-all transform hover:scale-[1.02]">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center mb-4">
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-purple-500/50 transition-all transform hover:scale-[1.02]">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Practice Mode</h3>
               <p className="text-gray-400 text-sm">Improve your accuracy and consistency</p>
-              <div className="mt-4 text-green-400 group-hover:text-green-300 flex items-center text-sm font-medium">
+              <div className="mt-4 text-purple-400 group-hover:text-purple-300 flex items-center text-sm font-medium">
                 Start Training
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

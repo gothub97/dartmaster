@@ -129,10 +129,10 @@ export default function VirtualDartboard({
     const isEvenSegment = index % 2 === 0;
     
     if (type === 'triple' || type === 'double') {
-      return isEvenSegment ? '#DC2626' : '#16A34A'; // Red or Green
+      return isEvenSegment ? '#ef4444' : '#10b981'; // Modern Red or Green
     }
     
-    return isEvenSegment ? '#0F172A' : '#F5F5DC'; // Black or Cream
+    return isEvenSegment ? '#1e293b' : '#f1f5f9'; // Dark slate or Light slate
   };
 
   // Undo last throw
@@ -147,8 +147,8 @@ export default function VirtualDartboard({
   return (
     <div className="flex flex-col items-center space-y-6">
       {/* Main dartboard container */}
-      <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-3xl shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent rounded-3xl"></div>
+      <div className="relative bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-slate-700/30">
+        <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 via-transparent to-green-600/5 rounded-2xl"></div>
         
         {/* Dartboard SVG */}
         <div className="relative">
@@ -157,33 +157,42 @@ export default function VirtualDartboard({
             width={size}
             height={size}
             viewBox="-110 -110 220 220"
-            className={`transform transition-transform ${disabled ? 'opacity-50' : 'cursor-crosshair'} drop-shadow-2xl`}
+            className={`transform transition-all duration-300 ${disabled ? 'opacity-50 grayscale' : 'cursor-crosshair hover:scale-[1.02]'} drop-shadow-2xl`}
             style={{ touchAction: 'none' }}
           >
             {/* Definitions for gradients and filters */}
             <defs>
               <radialGradient id="boardGradient">
-                <stop offset="0%" stopColor="#8B4513" stopOpacity="1"/>
-                <stop offset="100%" stopColor="#654321" stopOpacity="1"/>
+                <stop offset="0%" stopColor="#1e293b" stopOpacity="1"/>
+                <stop offset="100%" stopColor="#0f172a" stopOpacity="1"/>
               </radialGradient>
               <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                <feOffset dx="0" dy="2" result="offsetblur"/>
+                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                <feOffset dx="0" dy="4" result="offsetblur"/>
                 <feComponentTransfer>
-                  <feFuncA type="linear" slope="0.5"/>
+                  <feFuncA type="linear" slope="0.3"/>
                 </feComponentTransfer>
                 <feMerge>
                   <feMergeNode/>
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
               <radialGradient id="bullGradient">
-                <stop offset="0%" stopColor="#EF4444"/>
-                <stop offset="100%" stopColor="#DC2626"/>
+                <stop offset="0%" stopColor="#f87171"/>
+                <stop offset="50%" stopColor="#ef4444"/>
+                <stop offset="100%" stopColor="#dc2626"/>
               </radialGradient>
               <radialGradient id="outerBullGradient">
-                <stop offset="0%" stopColor="#22C55E"/>
-                <stop offset="100%" stopColor="#16A34A"/>
+                <stop offset="0%" stopColor="#4ade80"/>
+                <stop offset="50%" stopColor="#22c55e"/>
+                <stop offset="100%" stopColor="#16a34a"/>
               </radialGradient>
             </defs>
 
@@ -193,8 +202,8 @@ export default function VirtualDartboard({
               cy="0"
               r="105"
               fill="url(#boardGradient)"
-              stroke="#4A4A4A"
-              strokeWidth="2.5"
+              stroke="#334155"
+              strokeWidth="3"
               filter="url(#shadow)"
             />
             
@@ -204,9 +213,9 @@ export default function VirtualDartboard({
               cy="0"
               r={RINGS.WIRE}
               fill="none"
-              stroke="#C0C0C0"
-              strokeWidth="0.8"
-              opacity="0.6"
+              stroke="#94a3b8"
+              strokeWidth="1"
+              opacity="0.4"
             />
 
             {/* Double ring segments */}
@@ -215,11 +224,11 @@ export default function VirtualDartboard({
                 <path
                   d={generateSegmentPath(index, RINGS.DOUBLE_INNER, RINGS.DOUBLE_OUTER)}
                   fill={getSegmentColor(index, 'double')}
-                  stroke="#C0C0C0"
-                  strokeWidth="0.3"
+                  stroke="#64748b"
+                  strokeWidth="0.5"
                   className={`transition-all duration-200 ${
-                    !disabled && 'hover:brightness-125 hover:filter hover:drop-shadow-lg'
-                  } ${animatingThrow === `double-${index}` ? 'animate-pulse scale-105' : ''}`}
+                    !disabled && 'hover:brightness-150 hover:filter hover:drop-shadow-xl'
+                  } ${animatingThrow === `double-${index}` ? 'animate-pulse scale-110' : ''}`}
                   style={{ transformOrigin: 'center' }}
                   onClick={(e) => handleSegmentClick(value, MULTIPLIERS.DOUBLE, `double-${index}`, e)}
                   onMouseEnter={() => setHoveredSegment(`D${value}`)}
@@ -235,10 +244,10 @@ export default function VirtualDartboard({
                 <path
                   d={generateSegmentPath(index, RINGS.TRIPLE_OUTER, RINGS.SINGLE_OUTER)}
                   fill={getSegmentColor(index, 'single')}
-                  stroke="#999"
-                  strokeWidth="0.2"
+                  stroke="#475569"
+                  strokeWidth="0.3"
                   className={`transition-all duration-200 ${
-                    !disabled && 'hover:brightness-110'
+                    !disabled && 'hover:brightness-125'
                   } ${animatingThrow === `outer-single-${index}` ? 'animate-pulse' : ''}`}
                   onClick={(e) => handleSegmentClick(value, MULTIPLIERS.OUTER_SINGLE, `outer-single-${index}`, e)}
                   onMouseEnter={() => setHoveredSegment(`${value}`)}
@@ -254,11 +263,11 @@ export default function VirtualDartboard({
                 <path
                   d={generateSegmentPath(index, RINGS.TRIPLE_INNER, RINGS.TRIPLE_OUTER)}
                   fill={getSegmentColor(index, 'triple')}
-                  stroke="#C0C0C0"
-                  strokeWidth="0.3"
+                  stroke="#64748b"
+                  strokeWidth="0.5"
                   className={`transition-all duration-200 ${
-                    !disabled && 'hover:brightness-125 hover:filter hover:drop-shadow-lg'
-                  } ${animatingThrow === `triple-${index}` ? 'animate-pulse scale-105' : ''}`}
+                    !disabled && 'hover:brightness-150 hover:filter hover:drop-shadow-xl'
+                  } ${animatingThrow === `triple-${index}` ? 'animate-pulse scale-110' : ''}`}
                   style={{ transformOrigin: 'center' }}
                   onClick={(e) => handleSegmentClick(value, MULTIPLIERS.TRIPLE, `triple-${index}`, e)}
                   onMouseEnter={() => setHoveredSegment(`T${value}`)}
@@ -274,10 +283,10 @@ export default function VirtualDartboard({
                 <path
                   d={generateSegmentPath(index, RINGS.BULL_OUTER, RINGS.SINGLE_INNER)}
                   fill={getSegmentColor(index, 'single')}
-                  stroke="#999"
-                  strokeWidth="0.2"
+                  stroke="#475569"
+                  strokeWidth="0.3"
                   className={`transition-all duration-200 ${
-                    !disabled && 'hover:brightness-110'
+                    !disabled && 'hover:brightness-125'
                   } ${animatingThrow === `inner-single-${index}` ? 'animate-pulse' : ''}`}
                   onClick={(e) => handleSegmentClick(value, MULTIPLIERS.INNER_SINGLE, `inner-single-${index}`, e)}
                   onMouseEnter={() => setHoveredSegment(`${value}`)}
@@ -293,11 +302,12 @@ export default function VirtualDartboard({
               cy="0"
               r={RINGS.BULL_OUTER}
               fill="url(#outerBullGradient)"
-              stroke="#C0C0C0"
-              strokeWidth="0.5"
-              className={`transition-all duration-200 ${
-                !disabled && 'hover:brightness-125 hover:filter hover:drop-shadow-lg'
-              } ${animatingThrow === 'outer-bull' ? 'animate-pulse scale-110' : ''}`}
+              stroke="#64748b"
+              strokeWidth="0.8"
+              className={`transition-all duration-300 ${
+                !disabled && 'hover:brightness-150 hover:filter hover:drop-shadow-2xl'
+              } ${animatingThrow === 'outer-bull' ? 'animate-pulse scale-125' : ''}`}
+              filter={animatingThrow === 'outer-bull' ? 'url(#glow)' : ''}
               style={{ transformOrigin: 'center' }}
               onClick={(e) => handleSegmentClick('OUTER_BULL', 1, 'outer-bull', e)}
               onMouseEnter={() => setHoveredSegment('25')}
@@ -311,11 +321,12 @@ export default function VirtualDartboard({
               cy="0"
               r={RINGS.BULL_INNER}
               fill="url(#bullGradient)"
-              stroke="#C0C0C0"
-              strokeWidth="0.5"
-              className={`transition-all duration-200 ${
-                !disabled && 'hover:brightness-125 hover:filter hover:drop-shadow-lg'
-              } ${animatingThrow === 'inner-bull' ? 'animate-pulse scale-110' : ''}`}
+              stroke="#64748b"
+              strokeWidth="0.8"
+              className={`transition-all duration-300 ${
+                !disabled && 'hover:brightness-150 hover:filter hover:drop-shadow-2xl'
+              } ${animatingThrow === 'inner-bull' ? 'animate-pulse scale-125' : ''}`}
+              filter={animatingThrow === 'inner-bull' ? 'url(#glow)' : ''}
               style={{ transformOrigin: 'center' }}
               onClick={(e) => handleSegmentClick('BULL', 1, 'inner-bull', e)}
               onMouseEnter={() => setHoveredSegment('BULL')}
@@ -339,9 +350,9 @@ export default function VirtualDartboard({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke="#C0C0C0"
-                  strokeWidth="0.4"
-                  opacity="0.6"
+                  stroke="#64748b"
+                  strokeWidth="0.5"
+                  opacity="0.3"
                   pointerEvents="none"
                 />
               );
@@ -359,9 +370,9 @@ export default function VirtualDartboard({
                   key={`label-${index}`}
                   x={x}
                   y={y}
-                  fill="#FFF"
-                  fontSize="10"
-                  fontWeight="bold"
+                  fill="#e2e8f0"
+                  fontSize="11"
+                  fontWeight="600"
                   textAnchor="middle"
                   dominantBaseline="middle"
                   pointerEvents="none"
@@ -399,9 +410,9 @@ export default function VirtualDartboard({
 
           {/* Hover tooltip */}
           {hoveredSegment && (
-            <div className="absolute -top-14 left-1/2 transform -translate-x-1/2 bg-gray-900/95 backdrop-blur text-white px-4 py-2 rounded-xl text-lg font-bold pointer-events-none z-10 shadow-xl animate-fade-in">
-              <div className="text-center">{hoveredSegment}</div>
-              <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-gray-900/95"></div>
+            <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-xl text-white px-5 py-2.5 rounded-xl text-xl font-bold pointer-events-none z-10 shadow-2xl animate-fade-in border border-slate-700/50">
+              <div className="text-center bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">{hoveredSegment}</div>
+              <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-slate-900/95"></div>
             </div>
           )}
         </div>
@@ -410,17 +421,17 @@ export default function VirtualDartboard({
       {/* Last throws display */}
       {lastThrows.length > 0 && (
         <div className="flex items-center justify-center space-x-4">
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-4 shadow-xl">
+          <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl p-4 shadow-2xl border border-slate-700/30">
             <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium text-gray-400">Recent:</span>
+              <span className="text-sm font-medium text-slate-400">Recent:</span>
               <div className="flex space-x-2">
                 {lastThrows.map((throwData, index) => (
                   <div
                     key={throwData.timestamp}
-                    className={`px-4 py-2 rounded-xl font-bold transition-all transform ${
+                    className={`px-4 py-2 rounded-lg font-bold transition-all transform ${
                       index === 0 
-                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-white scale-110 shadow-lg animate-bounce-in' 
-                        : 'bg-gray-700/50 text-gray-300 scale-95'
+                        ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white scale-105 shadow-xl shadow-red-900/30 animate-bounce-in' 
+                        : 'bg-slate-800/50 text-slate-400 scale-95'
                     }`}
                   >
                     {throwData.display}
@@ -431,10 +442,10 @@ export default function VirtualDartboard({
               {/* Undo button */}
               <button
                 onClick={undoLastThrow}
-                className="p-3 rounded-xl bg-gray-700/50 hover:bg-gray-600/50 transition-all transform hover:scale-105 group"
+                className="p-3 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-all transform hover:scale-105 group border border-slate-700/30"
                 title="Undo last throw"
               >
-                <svg className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                 </svg>
               </button>
