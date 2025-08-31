@@ -69,6 +69,9 @@ export const PracticeProvider = ({ children }) => {
   const [practiceHistory, setPracticeHistory] = useState([]);
   const [practiceStats, setPracticeStats] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [throwCount, setThrowCount] = useState(0);
+  const [turnCount, setTurnCount] = useState(1);
+  const [dartInTurn, setDartInTurn] = useState(1);
 
   const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
 
@@ -76,11 +79,14 @@ export const PracticeProvider = ({ children }) => {
   const startPracticeSession = async (mode, settings = {}) => {
     if (!user) return null;
 
+    const sessionId = ID.unique();
+    const startedAt = new Date().toISOString();
+    
     const session = {
-      id: ID.unique(),
+      id: sessionId,
       mode,
       settings,
-      startedAt: new Date().toISOString(),
+      startedAt,
       throws: [],
       stats: {
         totalThrows: 0,
@@ -90,27 +96,110 @@ export const PracticeProvider = ({ children }) => {
         averageScore: 0,
         highestScore: 0,
         targetHits: {},
+        bullseyeCount: 0,
+        tripleCount: 0,
+        doubleCount: 0,
       },
       currentTarget: settings.startingTarget || null,
       targetsHit: [],
       checkoutAttempts: [],
     };
 
+    // Reset throw tracking
+    setThrowCount(0);
+    setTurnCount(1);
+    setDartInTurn(1);
+    
+    // Initialize statistics record
+    try {
+      await databases.createDocument(
+        DATABASE_ID,
+        'activity_statistics',
+        ID.unique(),
+        {
+          sessionId,
+          sessionType: 'practice',
+          userId: user.$id,
+          totalThrows: 0,
+          totalScore: 0,
+          averageScore: 0,
+          accuracy: null,
+          bullseyeCount: 0,
+          tripleCount: 0,
+          doubleCount: 0,
+          updatedAt: startedAt
+        }
+      );
+    } catch (error) {
+      console.error('Error creating statistics record:', error);
+    }
+
     setCurrentSession(session);
     return session;
   };
 
   // Record a practice throw
-  const recordThrow = async (segment, multiplier = 1) => {
-    if (!currentSession) return;
+  const recordThrow = async (segment, multiplier = 1, targetSegment = null, targetMultiplier = null) => {
+    if (!currentSession || !user) return;
 
     const score = segment === 25 ? (multiplier === 2 ? 50 : 25) : segment * multiplier;
+    const timestamp = new Date().toISOString();
+    const currentThrowNumber = throwCount + 1;
+    const currentDartNumber = dartInTurn;
+    const currentTurnNumber = turnCount;
+    
+    // Determine if hit target (if target was specified)
+    let isHit = null;
+    if (targetSegment !== null) {
+      isHit = segment === targetSegment && (!targetMultiplier || multiplier === targetMultiplier);
+    }
+    
     const throwData = {
       segment,
       multiplier,
       score,
-      timestamp: new Date().toISOString(),
+      timestamp,
+      throwNumber: currentThrowNumber,
+      dartNumber: currentDartNumber,
+      turnNumber: currentTurnNumber,
+      targetSegment,
+      targetMultiplier,
+      isHit
     };
+
+    // Save throw to database
+    try {
+      await databases.createDocument(
+        DATABASE_ID,
+        'activity_throws',
+        ID.unique(),
+        {
+          sessionId: currentSession.id,
+          sessionType: 'practice',
+          userId: user.$id,
+          throwNumber: currentThrowNumber,
+          segment,
+          multiplier,
+          score,
+          timestamp,
+          dartNumber: currentDartNumber,
+          turnNumber: currentTurnNumber,
+          targetSegment: targetSegment || null,
+          isHit: isHit
+        }
+      );
+    } catch (error) {
+      console.error('Error saving throw:', error);
+    }
+
+    // Update throw tracking
+    setThrowCount(currentThrowNumber);
+    if (currentDartNumber === 3) {
+      setDartInTurn(1);
+      setTurnCount(currentTurnNumber + 1);
+    } else {
+      setDartInTurn(currentDartNumber + 1);
+    }
 
     const updatedSession = { ...currentSession };
     updatedSession.throws.push(throwData);
@@ -138,7 +227,54 @@ export const PracticeProvider = ({ children }) => {
     // Update general statistics
     updateGeneralStats(updatedSession);
     
+    // Update statistics counts
+    if (segment === 25 && multiplier === 2) {
+      updatedSession.stats.bullseyeCount++;
+    }
+    if (multiplier === 3) {
+      updatedSession.stats.tripleCount++;
+    }
+    if (multiplier === 2 && segment !== 25) {
+      updatedSession.stats.doubleCount++;
+    }
+    
     setCurrentSession(updatedSession);
+    
+    // Update statistics record in database
+    try {
+      const totalScore = updatedSession.throws.reduce((sum, t) => sum + t.score, 0);
+      const averageScore = totalScore / updatedSession.throws.length;
+      const accuracy = updatedSession.stats.hits > 0 
+        ? (updatedSession.stats.hits / updatedSession.stats.totalThrows) * 100 
+        : null;
+        
+      // Try to find and update by sessionId
+      const stats = await databases.listDocuments(
+        DATABASE_ID,
+        'activity_statistics',
+        [Query.equal('sessionId', currentSession.id)]
+      );
+      
+      if (stats.documents.length > 0) {
+        await databases.updateDocument(
+          DATABASE_ID,
+          'activity_statistics',
+          stats.documents[0].$id,
+          {
+            totalThrows: updatedSession.stats.totalThrows,
+            totalScore,
+            averageScore,
+            accuracy,
+            bullseyeCount: updatedSession.stats.bullseyeCount,
+            tripleCount: updatedSession.stats.tripleCount,
+            doubleCount: updatedSession.stats.doubleCount,
+            updatedAt: new Date().toISOString()
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Error updating statistics:', error);
+    }
     
     // Auto-save session periodically
     if (updatedSession.throws.length % 10 === 0) {
@@ -426,6 +562,43 @@ export const PracticeProvider = ({ children }) => {
     }
   }, [user]);
 
+  // Fetch throw history for a session
+  const getSessionThrows = async (sessionId) => {
+    if (!user) return [];
+    
+    try {
+      const throws = await databases.listDocuments(
+        DATABASE_ID,
+        'activity_throws',
+        [
+          Query.equal('sessionId', sessionId),
+          Query.orderAsc('throwNumber')
+        ]
+      );
+      return throws.documents;
+    } catch (error) {
+      console.error('Error fetching session throws:', error);
+      return [];
+    }
+  };
+  
+  // Fetch statistics for a session
+  const getSessionStatistics = async (sessionId) => {
+    if (!user) return null;
+    
+    try {
+      const stats = await databases.listDocuments(
+        DATABASE_ID,
+        'activity_statistics',
+        [Query.equal('sessionId', sessionId)]
+      );
+      return stats.documents.length > 0 ? stats.documents[0] : null;
+    } catch (error) {
+      console.error('Error fetching session statistics:', error);
+      return null;
+    }
+  };
+
   const value = {
     currentSession,
     practiceHistory,
@@ -438,6 +611,8 @@ export const PracticeProvider = ({ children }) => {
     endSession,
     loadPracticeHistory,
     getCheckoutSuggestion,
+    getSessionThrows,
+    getSessionStatistics,
   };
 
   return (

@@ -359,36 +359,48 @@ export default function ActivitiesPage() {
             </div>
           ) : (
             matches.map((activity) => (
-              <div key={activity.id} className="bg-white rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4">
-                    {getActivityIcon(activity)}
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-1">
-                        <h3 className="font-semibold text-gray-900">
-                          {getActivityTitle(activity)}
-                        </h3>
-                        {getActivityStatus(activity)}
+              <Link 
+                key={activity.id} 
+                href={activity.type === 'practice' ? `/activities/${activity.id}` : '#'}
+                className="block"
+              >
+                <div className="bg-white rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start space-x-4">
+                      {getActivityIcon(activity)}
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-1">
+                          <h3 className="font-semibold text-gray-900">
+                            {getActivityTitle(activity)}
+                          </h3>
+                          {getActivityStatus(activity)}
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {getActivityStats(activity)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formatDate(activity.startedAt)}
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {getActivityStats(activity)}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {formatDate(activity.startedAt)}
-                      </p>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      {activity.type === 'practice' && (
+                        <span className="text-sm text-orange-600">View Details →</span>
+                      )}
+                      {activity.status === 'active' && (
+                        <Link
+                          href="/play"
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-3 py-1 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                        >
+                          Continue
+                        </Link>
+                      )}
                     </div>
                   </div>
-                  
-                  {activity.status === 'active' && (
-                    <Link
-                      href="/play"
-                      className="px-3 py-1 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                    >
-                      Continue
-                    </Link>
-                  )}
                 </div>
-              </div>
+              </Link>
             ))
           )}
         </div>
