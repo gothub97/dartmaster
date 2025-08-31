@@ -12,8 +12,8 @@ export default function SharedNavigation({ currentPage = "" }) {
     { href: "/dashboard", label: "Dashboard", active: currentPage === "dashboard" },
     { href: "/play", label: "Play", active: currentPage === "play" },
     { href: "/practice", label: "Practice", active: currentPage === "practice" },
+    { href: "/activities", label: "Activities", active: currentPage === "activities" },
     { href: "/players", label: "Players", active: currentPage === "players" },
-    { href: "/friends", label: "Friends", active: currentPage === "friends" },
     { href: "/profile", label: "Profile", active: currentPage === "profile" }
   ];
 

@@ -14,6 +14,11 @@ export default function RootLayout({ children }) {
       <head>
         <title>Dartmaster - Master Your Dart Game</title>
         <meta name="description" content="Track your dart games, improve your skills, and compete with friends on Dartmaster." />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#f97316" />
       </head>
       <body>
         <AuthProvider>

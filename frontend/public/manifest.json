@@ -1,0 +1,17 @@
+{
+  "name": "Dartmaster",
+  "short_name": "Dartmaster",
+  "description": "Track your dart games, improve your skills, and compete with friends",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

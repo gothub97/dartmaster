@@ -162,8 +162,14 @@ export default function PlayPage() {
                 <Link href="/practice" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
                   Training
                 </Link>
-                <Link href="/friends" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  Friends
+                <Link href="/activities" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                  Activities
+                </Link>
+                <Link href="/players" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                  Players
+                </Link>
+                <Link href="/profile" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                  Profile
                 </Link>
               </nav>
 
