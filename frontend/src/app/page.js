@@ -17,7 +17,7 @@ export default function Home() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
                 </div>
                 <span className="font-bold text-xl">Dartmaster</span>
@@ -29,7 +29,7 @@ export default function Home() {
               </a>
               <a
                 href="/auth/register"
-                className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition"
+                className="bg-orange-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-orange-600 transition"
               >
                 Get Started Free
               </a>
@@ -42,14 +42,14 @@ export default function Home() {
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <div className="inline-flex items-center space-x-2 bg-red-50 rounded-full px-4 py-2 mb-8">
-              <span className="text-red-600 font-semibold">NEW</span>
+            <div className="inline-flex items-center space-x-2 bg-orange-50 rounded-full px-4 py-2 mb-8">
+              <span className="text-orange-600 font-semibold">NEW</span>
               <span className="text-gray-700">Real-time match tracking now available</span>
             </div>
             
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6">
               Your Darts.<br />
-              <span className="bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-orange-500 to-orange-400 bg-clip-text text-transparent">
                 Perfected.
               </span>
             </h1>
@@ -62,7 +62,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/auth/register"
-                className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-red-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-orange-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Start Free Trial →
               </a>
@@ -78,18 +78,18 @@ export default function Home() {
 
           {/* Hero Image/Visual */}
           <div className="mt-20 relative">
-            <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl p-8 shadow-2xl">
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="bg-white rounded-xl p-6 shadow-lg">
-                  <div className="text-4xl font-bold text-red-600 mb-2">98.2%</div>
+                  <div className="text-4xl font-bold text-orange-500 mb-2">98.2%</div>
                   <div className="text-gray-600">Accuracy Tracking</div>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-lg">
-                  <div className="text-4xl font-bold text-red-600 mb-2">47</div>
+                  <div className="text-4xl font-bold text-orange-500 mb-2">47</div>
                   <div className="text-gray-600">Average Improvement</div>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-lg">
-                  <div className="text-4xl font-bold text-red-600 mb-2">180</div>
+                  <div className="text-4xl font-bold text-orange-500 mb-2">180</div>
                   <div className="text-gray-600">Perfect Scores</div>
                 </div>
               </div>
@@ -113,8 +113,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
@@ -126,8 +126,8 @@ export default function Home() {
 
             {/* Feature 2 */}
             <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
               </div>
@@ -139,8 +139,8 @@ export default function Home() {
 
             {/* Feature 3 */}
             <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
@@ -152,8 +152,8 @@ export default function Home() {
 
             {/* Feature 4 */}
             <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -165,8 +165,8 @@ export default function Home() {
 
             {/* Feature 5 */}
             <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -178,8 +178,8 @@ export default function Home() {
 
             {/* Feature 6 */}
             <div className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
@@ -206,7 +206,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+              <div className="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                 1
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Create Your Account</h3>
@@ -216,7 +216,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+              <div className="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                 2
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Start Playing</h3>
@@ -226,7 +226,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+              <div className="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                 3
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Track & Improve</h3>
@@ -239,7 +239,7 @@ export default function Home() {
       </section>
 
       {/* Social Proof */}
-      <section className="py-20 bg-gradient-to-br from-red-50 to-orange-50">
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -252,19 +252,19 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">10K+</div>
+              <div className="text-4xl font-bold text-orange-500 mb-2">10K+</div>
               <div className="text-gray-600">Active Players</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">2M+</div>
+              <div className="text-4xl font-bold text-orange-500 mb-2">2M+</div>
               <div className="text-gray-600">Matches Tracked</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">500+</div>
+              <div className="text-4xl font-bold text-orange-500 mb-2">500+</div>
               <div className="text-gray-600">Clubs & Leagues</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">4.9/5</div>
+              <div className="text-4xl font-bold text-orange-500 mb-2">4.9/5</div>
               <div className="text-gray-600">User Rating</div>
             </div>
           </div>
@@ -325,7 +325,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/auth/register"
-              className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-red-700 transition shadow-lg hover:shadow-xl"
+              className="bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-orange-600 transition shadow-lg hover:shadow-xl"
             >
               Start Free Trial →
             </a>
