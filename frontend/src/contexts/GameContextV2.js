@@ -49,6 +49,7 @@ export const GameProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [autoSaveTimer, setAutoSaveTimer] = useState(null);
   const [subscription, setSubscription] = useState(null);
+  const [currentAim, setCurrentAim] = useState(null); // { ring: 'S'|'D'|'T'|'BULL'|'DBULL', number?: 1..20 }
 
   const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
 
@@ -198,6 +199,12 @@ export const GameProvider = ({ children }) => {
 
     // Add dart to current turn
     const dart = { segment, multiplier, score, timestamp: new Date().toISOString() };
+    if (currentAim) {
+      dart.aimRing = currentAim.ring;
+      if (currentAim.ring !== 'BULL' && currentAim.ring !== 'DBULL') {
+        dart.aimNumber = currentAim.number;
+      }
+    }
     player.darts.push(dart);
     match.currentDarts.push(dart); // Add to current darts array
     
@@ -658,6 +665,8 @@ export const GameProvider = ({ children }) => {
     endMatch,
     deleteMatch,
     GAME_MODES,
+    currentAim,
+    setAim: setCurrentAim,
   };
 
   return (

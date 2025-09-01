@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useGame } from "@/contexts/GameContextV2";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import ProfileButton from "@/components/layout/ProfileButton";
+import AimPicker from "@/components/game/AimPicker";
 
 export default function PlayPage() {
   const router = useRouter();
@@ -20,7 +21,9 @@ export default function PlayPage() {
     getSpectatorLink,
     clearCurrentMatch,
     endMatch,
-    GAME_MODES 
+    GAME_MODES,
+    currentAim,
+    setAim 
   } = useGame();
   
   const [showGameSetup, setShowGameSetup] = useState(!currentMatch);
@@ -164,6 +167,9 @@ export default function PlayPage() {
                 </Link>
                 <Link href="/activities" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
                   Activities
+                </Link>
+                <Link href="/me/stats" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                  Stats
                 </Link>
                 <Link href="/players" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
                   Players
@@ -395,6 +401,10 @@ export default function PlayPage() {
               </svg>
               <span>Undo</span>
             </button>
+          </div>
+          {/* Aim Picker */}
+          <div className="mt-4">
+            <AimPicker value={currentAim || undefined} onChange={setAim} />
           </div>
         </div>
 

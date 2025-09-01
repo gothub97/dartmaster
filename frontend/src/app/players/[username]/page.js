@@ -280,6 +280,11 @@ export default function PublicProfilePage() {
                 <div className="text-sm text-gray-600 mt-1">Avg Score</div>
               </div>
             </div>
+            <div className="mt-6">
+              <Link href={`/players/${profile.username}/stats`} className="inline-flex items-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-semibold transition">
+                View Full Statistics
+              </Link>
+            </div>
           </div>
         )}
 

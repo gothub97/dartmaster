@@ -8,6 +8,7 @@ import { useUserProfile } from "@/contexts/UserProfileContext";
 import { useFriends } from "@/contexts/FriendsContext";
 import ProfileButton from "@/components/layout/ProfileButton";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import AdminMenu from "@/components/admin/AdminMenu";
 import { useNotifications } from "@/contexts/NotificationContext";
 import ActivityCard from "@/components/activity/ActivityCard";
 import { useStats } from "@/hooks/useStats";
@@ -72,9 +73,8 @@ export default function DashboardPage() {
           DATABASE_ID,
           "challenges",
           [
-            Query.greaterThan("endDate", now),
-            Query.lessThan("startDate", now),
-            Query.orderDesc("startDate"),
+            Query.greaterThan("endDate", now), // Not ended yet
+            Query.orderAsc("startDate"),
             Query.limit(5)
           ]
         );
@@ -197,6 +197,18 @@ export default function DashboardPage() {
                 Activities
               </Link>
               <Link 
+                href="/challenges"
+                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                Challenges
+              </Link>
+              <Link 
+                href="/me/stats"
+                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                Stats
+              </Link>
+              <Link 
                 href="/friends"
                 className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
               >
@@ -206,6 +218,7 @@ export default function DashboardPage() {
 
             {/* Right side */}
             <div className="flex items-center space-x-4">
+              {profile?.isAdmin && <AdminMenu />}
               <NotificationBell />
               <ProfileButton />
               <button
@@ -380,42 +393,75 @@ export default function DashboardPage() {
             <div className="lg:col-span-3 space-y-4 lg:sticky lg:top-8 lg:h-fit">
               {/* Upcoming Challenges */}
               <div className="bg-white rounded-lg p-6 border border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-4">Challenges</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-gray-900">Challenges</h3>
+                  <Link 
+                    href="/challenges" 
+                    className="text-xs text-orange-600 hover:text-orange-700"
+                  >
+                    View all →
+                  </Link>
+                </div>
                 <div className="space-y-3">
                   {challenges.length > 0 ? (
-                    challenges.map((challenge) => {
-                      const daysLeft = Math.ceil((new Date(challenge.endDate) - new Date()) / (1000 * 60 * 60 * 24));
-                      const isActive = daysLeft <= 3;
+                    challenges.slice(0, 3).map((challenge) => {
+                      const now = new Date();
+                      const startDate = new Date(challenge.startDate);
+                      const endDate = new Date(challenge.endDate);
+                      const status = now < startDate ? 'upcoming' : now > endDate ? 'ended' : 'active';
+                      const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+                      
+                      let participants = [];
+                      try {
+                        participants = challenge.participants ? JSON.parse(challenge.participants) : [];
+                      } catch (e) {
+                        participants = [];
+                      }
+                      const isParticipant = participants.some(p => p.userId === user?.$id);
                       
                       return (
-                        <div key={challenge.$id} className={`p-3 rounded-lg ${isActive ? 'bg-orange-50 border border-orange-200' : 'bg-gray-50'}`}>
+                        <Link
+                          key={challenge.$id} 
+                          href="/challenges"
+                          className={`block p-3 rounded-lg transition-colors ${
+                            status === 'active' 
+                              ? 'bg-orange-50 border border-orange-200 hover:bg-orange-100' 
+                              : 'bg-gray-50 hover:bg-gray-100'
+                          }`}
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-medium text-gray-900">{challenge.name}</span>
-                            <span className={`text-xs ${isActive ? 'text-orange-600' : 'text-gray-500'}`}>
-                              {daysLeft}d left
+                            <span className={`text-xs ${
+                              status === 'active' ? 'text-orange-600' : 
+                              status === 'upcoming' ? 'text-blue-600' : 
+                              'text-gray-500'
+                            }`}>
+                              {status === 'active' ? `${daysLeft}d left` : 
+                               status === 'upcoming' ? 'Upcoming' : 
+                               'Ended'}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500">{challenge.description}</div>
-                        </div>
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs text-gray-500 truncate pr-2">
+                              {challenge.description || `${challenge.type} challenge`}
+                            </div>
+                            {isParticipant && (
+                              <span className="text-xs text-green-600">✓ Joined</span>
+                            )}
+                          </div>
+                        </Link>
                       );
                     })
                   ) : (
-                    <>
-                      <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-900">Weekly 501 Tournament</span>
-                          <span className="text-xs text-orange-600">Coming Soon</span>
-                        </div>
-                        <div className="text-xs text-gray-500">Join the weekly tournament</div>
-                      </div>
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-900">Bullseye Challenge</span>
-                          <span className="text-xs text-gray-500">Daily</span>
-                        </div>
-                        <div className="text-xs text-gray-500">Hit 50 bullseyes</div>
-                      </div>
-                    </>
+                    <div className="text-center py-4">
+                      <p className="text-sm text-gray-500 mb-3">No active challenges</p>
+                      <Link 
+                        href="/challenges"
+                        className="text-sm text-orange-600 hover:text-orange-700"
+                      >
+                        Browse challenges →
+                      </Link>
+                    </div>
                   )}
                 </div>
               </div>

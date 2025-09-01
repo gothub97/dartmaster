@@ -95,6 +95,9 @@ export default function PlayersPage() {
                   <Link href="/activities" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
                     Activities
                   </Link>
+                  <Link href="/me/stats" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                    Stats
+                  </Link>
                   <Link href="/players" className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1">
                     Players
                   </Link>

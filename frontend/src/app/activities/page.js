@@ -276,6 +276,9 @@ export default function ActivitiesPage() {
               <Link href="/activities" className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1">
                 Activities
               </Link>
+              <Link href="/me/stats" className="text-sm font-medium text-gray-500 hover:text-gray-900">
+                Stats
+              </Link>
               <Link href="/friends" className="text-sm font-medium text-gray-500 hover:text-gray-900">
                 Friends
               </Link>
