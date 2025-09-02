@@ -1,0 +1,26 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="60" cy="60" r="55" fill="#f97316"/>
+  
+  <!-- Dartboard Ring Pattern -->
+  <circle cx="60" cy="60" r="50" fill="none" stroke="#fb923c" stroke-width="2" opacity="0.3"/>
+  <circle cx="60" cy="60" r="40" fill="none" stroke="#fb923c" stroke-width="2" opacity="0.3"/>
+  <circle cx="60" cy="60" r="30" fill="none" stroke="#fb923c" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Center Bullseye -->
+  <circle cx="60" cy="60" r="12" fill="#dc2626"/>
+  <circle cx="60" cy="60" r="6" fill="#ffffff"/>
+  
+  <!-- Dart Arrow pointing to center -->
+  <g transform="rotate(-45 60 60)">
+    <!-- Dart shaft -->
+    <rect x="58" y="75" width="4" height="25" fill="#1f2937"/>
+    
+    <!-- Dart flights -->
+    <path d="M 55 95 L 60 100 L 65 95 L 60 90 Z" fill="#f97316"/>
+    <path d="M 55 90 L 60 95 L 65 90 L 60 85 Z" fill="#dc2626"/>
+    
+    <!-- Dart tip -->
+    <polygon points="60,75 58,73 60,70 62,73" fill="#374151"/>
+  </g>
+</svg>

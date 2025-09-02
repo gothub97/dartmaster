@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dartmaster Logo Export</title>
+</head>
+<body style="margin: 0; padding: 20px; background: #f3f4f6; font-family: system-ui;">
+    <h1 style="color: #1f2937;">Dartmaster Logo - 120x120px</h1>
+    <p style="color: #6b7280;">Right-click the logo below and select "Save Image As..." to download as PNG</p>
+    
+    <!-- Canvas for PNG export -->
+    <canvas id="logoCanvas" width="120" height="120" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px;"></canvas>
+    
+    <br><br>
+    
+    <!-- Download button -->
+    <button id="downloadBtn" style="
+        background: #f97316;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+    ">Download Logo as PNG</button>
+
+    <script>
+        // Draw logo on canvas
+        const canvas = document.getElementById('logoCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.arc(60, 60, 55, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Dartboard rings
+        ctx.strokeStyle = '#fb923c';
+        ctx.globalAlpha = 0.3;
+        ctx.lineWidth = 2;
+        
+        // Ring 1
+        ctx.beginPath();
+        ctx.arc(60, 60, 50, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Ring 2
+        ctx.beginPath();
+        ctx.arc(60, 60, 40, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Ring 3
+        ctx.beginPath();
+        ctx.arc(60, 60, 30, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.globalAlpha = 1;
+        
+        // Red center
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.arc(60, 60, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // White bullseye
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(60, 60, 6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Dart (rotated -45 degrees)
+        ctx.save();
+        ctx.translate(60, 60);
+        ctx.rotate(-Math.PI / 4);
+        ctx.translate(-60, -60);
+        
+        // Dart shaft
+        ctx.fillStyle = '#1f2937';
+        ctx.fillRect(58, 75, 4, 25);
+        
+        // Dart flights - orange
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.moveTo(55, 95);
+        ctx.lineTo(60, 100);
+        ctx.lineTo(65, 95);
+        ctx.lineTo(60, 90);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Dart flights - red
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.moveTo(55, 90);
+        ctx.lineTo(60, 95);
+        ctx.lineTo(65, 90);
+        ctx.lineTo(60, 85);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Dart tip
+        ctx.fillStyle = '#374151';
+        ctx.beginPath();
+        ctx.moveTo(60, 75);
+        ctx.lineTo(58, 73);
+        ctx.lineTo(60, 70);
+        ctx.lineTo(62, 73);
+        ctx.closePath();
+        ctx.fill();
+        
+        ctx.restore();
+        
+        // Download functionality
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.download = 'dartmaster-logo-120x120.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    </script>
+</body>
+</html>

@@ -377,8 +377,8 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-gray-900 mb-4">Legal</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Privacy</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Terms</a></li>
+                <li><a href="/privacy" className="text-gray-600 hover:text-gray-900">Privacy Policy</a></li>
+                <li><a href="/terms" className="text-gray-600 hover:text-gray-900">Terms of Service</a></li>
                 <li><a href="#" className="text-gray-600 hover:text-gray-900">Cookies</a></li>
               </ul>
             </div>

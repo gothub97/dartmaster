@@ -156,6 +156,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      // Initiate OAuth2 login with Google
+      const successUrl = `${window.location.origin}/auth/callback`;
+      const failureUrl = `${window.location.origin}/auth/login?error=oauth_failed`;
+      
+      await account.createOAuth2Session(
+        'google',
+        successUrl,
+        failureUrl,
+        ['profile', 'email']
+      );
+      
+      // The user will be redirected to Google
+      return { success: true };
+    } catch (error) {
+      console.error("Google login error:", error);
+      return { 
+        success: false, 
+        error: error.message || "Failed to login with Google" 
+      };
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -165,6 +189,7 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
     sendPasswordRecovery,
     resetPassword,
+    loginWithGoogle,
     checkUser
   };
 
