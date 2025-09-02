@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +16,39 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    // Check for OAuth error in URL params
+    const errorParam = searchParams.get('error');
+    const errorDetails = searchParams.get('details');
+    
+    if (errorParam) {
+      let errorMessage = '';
+      
+      switch(errorParam) {
+        case 'oauth_failed':
+          errorMessage = 'Google sign-in failed. Please try again or use email/password.';
+          break;
+        case 'session_failed':
+          errorMessage = 'Failed to create session. Please try again.';
+          break;
+        case 'user_unauthorized_oauth':
+          errorMessage = 'Google OAuth is not properly configured. Please contact support.';
+          break;
+        case 'general_unauthorized_scope':
+          errorMessage = 'Invalid OAuth scope. Please check your Google account permissions.';
+          break;
+        default:
+          errorMessage = errorDetails ? decodeURIComponent(errorDetails) : 'Authentication failed. Please try again.';
+      }
+      
+      setError(errorMessage);
+      
+      // Clear error params from URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
