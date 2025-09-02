@@ -12,11 +12,10 @@ class ClubTeamsService {
   // Create a new club with Appwrite Team
   async createClub(clubData, userId) {
     try {
-      // 1. Create Appwrite Team with custom roles
+      // 1. Create Appwrite Team (user who creates becomes owner automatically)
       const team = await teams.create(
         ID.unique(),
-        clubData.name,
-        ['captain', 'member'] // Custom roles beyond owner
+        clubData.name
       );
       
       // 2. Create club document in database
@@ -44,22 +43,29 @@ class ClubTeamsService {
             minLevel: 0,
             maxMembers: 100,
             allowGuestPlay: false,
-            tournamentFrequency: "weekly"
+            tournamentFrequency: "weekly",
+            captains: [],  // Track captain user IDs separately
+            moderators: []  // Track moderator user IDs separately
           }),
           createdBy: userId,
           createdAt: new Date().toISOString()
         },
         [
           Permission.read(Role.any()),
-          Permission.update(Role.team(team.$id, ["owner", "captain"])),
-          Permission.delete(Role.team(team.$id, ["owner"]))
+          Permission.update(Role.team(team.$id, "owner")),
+          Permission.update(Role.team(team.$id)),
+          Permission.delete(Role.team(team.$id, "owner"))
         ]
       );
       
-      // 3. Create initial activity
-      await this.addClubActivity(club.$id, team.$id, "club_created", userId, {
-        message: "Club was created"
-      });
+      // 3. Create initial activity (skip if it fails since it's non-critical)
+      try {
+        await this.addClubActivity(club.$id, team.$id, "club_created", userId, {
+          message: "Club was created"
+        });
+      } catch (activityError) {
+        console.log("Could not create initial activity:", activityError);
+      }
       
       return { team, club };
     } catch (error) {
@@ -202,7 +208,7 @@ class ClubTeamsService {
       // For open clubs, directly add the member
       const membership = await teams.createMembership(
         club.teamId,
-        ["member"],
+        [],  // Empty roles array for regular members
         userEmail || undefined,
         userId || undefined
       );
@@ -230,13 +236,13 @@ class ClubTeamsService {
   }
 
   // Invite member to club
-  async inviteMember(clubId, email, role = "member") {
+  async inviteMember(clubId, email, roles = []) {
     try {
       const club = await this.getClub(clubId);
       
       const membership = await teams.createMembership(
         club.teamId,
-        [role],
+        roles,
         email,
         undefined,
         undefined,
@@ -357,21 +363,54 @@ class ClubTeamsService {
     }
   }
 
-  // Update member role
-  async updateMemberRole(clubId, membershipId, roles) {
+  // Update member role (captain/moderator)
+  async updateMemberRole(clubId, userId, role, action = 'add') {
     try {
       const club = await this.getClub(clubId);
+      const settings = club.settings || {};
       
-      const membership = await teams.updateMembership(
-        club.teamId,
-        membershipId,
-        roles
-      );
+      if (role === 'captain') {
+        if (action === 'add' && !settings.captains?.includes(userId)) {
+          settings.captains = [...(settings.captains || []), userId];
+        } else if (action === 'remove') {
+          settings.captains = (settings.captains || []).filter(id => id !== userId);
+        }
+      } else if (role === 'moderator') {
+        if (action === 'add' && !settings.moderators?.includes(userId)) {
+          settings.moderators = [...(settings.moderators || []), userId];
+        } else if (action === 'remove') {
+          settings.moderators = (settings.moderators || []).filter(id => id !== userId);
+        }
+      }
       
-      return membership;
+      await this.updateClub(clubId, { settings });
+      
+      return { success: true };
     } catch (error) {
       console.error("Error updating member role:", error);
       throw error;
+    }
+  }
+  
+  // Check if user is captain or moderator
+  async getUserClubRole(clubId, userId) {
+    try {
+      const club = await this.getClub(clubId);
+      const settings = club.settings || {};
+      
+      if (club.createdBy === userId) {
+        return 'owner';
+      }
+      if (settings.captains?.includes(userId)) {
+        return 'captain';
+      }
+      if (settings.moderators?.includes(userId)) {
+        return 'moderator';
+      }
+      return 'member';
+    } catch (error) {
+      console.error("Error getting user club role:", error);
+      return 'member';
     }
   }
 
@@ -390,8 +429,9 @@ class ClubTeamsService {
           createdAt: new Date().toISOString()
         },
         [
-          Permission.read(Role.team(teamId)),
-          Permission.write(Role.team(teamId, ["owner", "captain"]))
+          Permission.read(Role.any()),  // Anyone can read activities
+          Permission.update(Role.user(userId)),  // User can update their own activity
+          Permission.delete(Role.user(userId))  // User can delete their own activity
         ]
       );
       
@@ -399,6 +439,7 @@ class ClubTeamsService {
     } catch (error) {
       console.error("Error adding club activity:", error);
       // Non-critical error, don't throw
+      return null;
     }
   }
 
@@ -443,14 +484,15 @@ class ClubTeamsService {
           clubId,
           title,
           content,
-          authorId,
-          isPinned: false,
+          priority: "normal",
+          createdBy: authorId,
           createdAt: new Date().toISOString()
         },
         [
-          Permission.read(Role.team(club.teamId)),
-          Permission.update(Role.team(club.teamId, ["owner", "captain"])),
-          Permission.delete(Role.team(club.teamId, ["owner", "captain"]))
+          Permission.read(Role.any()),  // Anyone can read announcements
+          Permission.update(Role.user(authorId)),  // Author can update
+          Permission.update(Role.team(club.teamId, "owner")),  // Owner can update
+          Permission.delete(Role.team(club.teamId, "owner"))  // Only owner can delete
         ]
       );
       
@@ -513,9 +555,9 @@ class ClubTeamsService {
           createdAt: new Date().toISOString()
         },
         [
-          Permission.read(Role.team(club.teamId)),
-          Permission.update(Role.team(club.teamId, ["owner", "captain"])),
-          Permission.delete(Role.team(club.teamId, ["owner"]))
+          Permission.read(Role.any()),  // Anyone can view tournaments
+          Permission.update(Role.team(club.teamId, "owner")),  // Owner can update
+          Permission.delete(Role.team(club.teamId, "owner"))  // Owner can delete
         ]
       );
       

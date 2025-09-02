@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,8 +9,9 @@ import SharedNavigation from "@/components/layout/SharedNavigation";
 
 export default function CreateClubPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { createClub } = useClub();
+  const isSubmitting = useRef(false);
   
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -110,6 +111,10 @@ export default function CreateClubPage() {
 
     if (!validateStep(3)) return;
 
+    // Prevent double submission
+    if (loading || isSubmitting.current) return;
+    isSubmitting.current = true;
+
     try {
       setLoading(true);
       setError("");
@@ -140,10 +145,29 @@ export default function CreateClubPage() {
     } catch (error) {
       console.error("Error creating club:", error);
       setError(error.message || "Failed to create club. Please try again.");
+      isSubmitting.current = false;
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <SharedNavigation />
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if not authenticated
+  if (!user) {
+    router.push("/auth/login");
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

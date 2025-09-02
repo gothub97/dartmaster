@@ -10,7 +10,7 @@ import ClubCard from "@/components/clubs/ClubCard";
 
 export default function ClubsPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { 
     clubs, 
     userClubs, 
@@ -28,19 +28,22 @@ export default function ClubsPage() {
   const [selectedCity, setSelectedCity] = useState("");
   const [joiningClub, setJoiningClub] = useState(null);
 
+  // Only redirect after auth is loaded and confirmed no user
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/auth/login");
     }
-  }, [user, router]);
+  }, [authLoading, user, router]);
 
   useEffect(() => {
-    loadClubs({
-      country: selectedCountry || undefined,
-      city: selectedCity || undefined,
-      search: searchQuery || undefined
-    });
-  }, [selectedCountry, selectedCity]);
+    if (user) {
+      loadClubs({
+        country: selectedCountry || undefined,
+        city: selectedCity || undefined,
+        search: searchQuery || undefined
+      });
+    }
+  }, [selectedCountry, selectedCity, user]);
 
   const handleJoinClub = async (clubId) => {
     try {
@@ -70,6 +73,23 @@ export default function ClubsPage() {
     : filter === "public"
     ? clubs.filter(club => club.isPublic)
     : clubs;
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <SharedNavigation />
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render content if no user (will redirect)
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
