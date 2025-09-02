@@ -7,14 +7,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { databases } from "@/lib/appwrite";
 import { Query, ID } from "appwrite";
-import ProfileButton from "@/components/layout/ProfileButton";
-import NotificationBell from "@/components/notifications/NotificationBell";
+import SharedNavigation from "@/components/layout/SharedNavigation";
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
 
 export default function AdminChallengesPage() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { profile } = useUserProfile();
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +25,16 @@ export default function AdminChallengesPage() {
     startDate: "",
     endDate: "",
     rules: "",
-    prizes: ""
+    prizes: "",
+    scoringType: "points",
+    scoringConfig: {
+      winPoints: 10,
+      gamePoints: 1,
+      bullseyePoints: 5,
+      score180Points: 10,
+      highScoreBonus: 20,
+      minGamesRequired: 3
+    }
   });
 
   useEffect(() => {
@@ -59,10 +67,26 @@ export default function AdminChallengesPage() {
     e.preventDefault();
     
     try {
+      // Combine rules text with scoring configuration
+      const scoringRules = {
+        text: formData.rules,
+        scoring: {
+          type: formData.scoringType,
+          config: formData.scoringConfig
+        }
+      };
+
       const challengeData = {
-        ...formData,
+        name: formData.name,
+        description: formData.description,
+        type: formData.type,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        rules: JSON.stringify(scoringRules),
+        prizes: formData.prizes,
         createdBy: user.$id,
-        participants: JSON.stringify([])
+        participants: JSON.stringify([]),
+        leaderboard: JSON.stringify([])
       };
 
       await databases.createDocument(
@@ -80,7 +104,16 @@ export default function AdminChallengesPage() {
         startDate: "",
         endDate: "",
         rules: "",
-        prizes: ""
+        prizes: "",
+        scoringType: "points",
+        scoringConfig: {
+          winPoints: 10,
+          gamePoints: 1,
+          bullseyePoints: 5,
+          score180Points: 10,
+          highScoreBonus: 20,
+          minGamesRequired: 3
+        }
       });
       loadChallenges();
     } catch (error) {
@@ -101,12 +134,6 @@ export default function AdminChallengesPage() {
     }
   };
 
-  const handleLogout = async () => {
-    const result = await logout();
-    if (result.success) {
-      router.push("/");
-    }
-  };
 
   if (!profile?.isAdmin) {
     return (
@@ -123,38 +150,7 @@ export default function AdminChallengesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/dashboard" className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="font-semibold text-gray-900 text-lg">Dartmaster</span>
-              </Link>
-            </div>
-
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                Dashboard
-              </Link>
-              <Link href="/admin/challenges" className="text-sm font-medium text-gray-900 border-b-2 border-purple-600 pb-1">
-                Admin - Challenges
-              </Link>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <NotificationBell />
-              <ProfileButton />
-              <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SharedNavigation />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -252,14 +248,212 @@ export default function AdminChallengesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Rules</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Rules Description</label>
                     <textarea
                       value={formData.rules}
                       onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       rows="3"
-                      placeholder="Enter challenge rules..."
+                      placeholder="Enter challenge rules description..."
                     />
+                  </div>
+
+                  {/* Scoring Configuration */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Scoring Type
+                      </label>
+                      <select
+                        value={formData.scoringType}
+                        onChange={(e) => setFormData({...formData, scoringType: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      >
+                        <option value="points">Points Based</option>
+                        <option value="wins">Wins Based</option>
+                        <option value="average">Average Score</option>
+                        <option value="bullseye">Bullseye Count</option>
+                        <option value="custom">Custom Scoring</option>
+                      </select>
+                    </div>
+
+                    {/* Scoring Configuration Details */}
+                    {formData.scoringType === "points" && (
+                      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">Points Configuration</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Win Points</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.winPoints}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, winPoints: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Game Points</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.gamePoints}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, gamePoints: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Bullseye Points</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.bullseyePoints}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, bullseyePoints: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">180 Points</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.score180Points}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, score180Points: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">High Score Bonus</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.highScoreBonus}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, highScoreBonus: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Min Games Required</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.minGamesRequired}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, minGamesRequired: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.scoringType === "wins" && (
+                      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">Wins Configuration</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Points per Win</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.winPoints || 1}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, winPoints: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Min Games Required</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.minGamesRequired}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, minGamesRequired: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.scoringType === "average" && (
+                      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">Average Score Configuration</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Min Games Required</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.minGamesRequired}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, minGamesRequired: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Score Multiplier</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={formData.scoringConfig.scoreMultiplier || 1}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, scoreMultiplier: parseFloat(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.scoringType === "bullseye" && (
+                      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">Bullseye Configuration</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Points per Bullseye</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.bullseyePoints || 1}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, bullseyePoints: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Min Games Required</label>
+                            <input
+                              type="number"
+                              value={formData.scoringConfig.minGamesRequired}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                scoringConfig: {...formData.scoringConfig, minGamesRequired: parseInt(e.target.value)}
+                              })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>

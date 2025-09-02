@@ -181,13 +181,21 @@ export const NotificationProvider = ({ children }) => {
               };
             }
             
+            // Ensure playerProfile is not null
+            if (!playerProfile) {
+              playerProfile = {
+                username: activePlayer?.username || activePlayer?.name || 'Player',
+                avatarUrl: null
+              };
+            }
+            
             notificationList.push({
               id: `match_${match.$id}`,
               type: 'match_active',
               title: 'Game in Progress',
-              message: `@${playerProfile.username} is playing ${match.mode} - Round ${currentState.currentRound || 1}`,
-              avatar: playerProfile.avatarUrl,
-              username: playerProfile.username,
+              message: `@${playerProfile?.username || 'Player'} is playing ${match.mode} - Round ${currentState.currentRound || 1}`,
+              avatar: playerProfile?.avatarUrl,
+              username: playerProfile?.username || 'Player',
               timestamp: new Date(match.startedAt),
               data: { match, activePlayer }
             });

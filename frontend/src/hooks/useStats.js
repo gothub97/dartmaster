@@ -42,7 +42,7 @@ export const useStats = () => {
   }, [user]);
 
   const calculateStats = async () => {
-    if (!user) return;
+    if (!user || !user.$id) return;
 
     try {
       setLoading(true);

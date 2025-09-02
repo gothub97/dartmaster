@@ -1,79 +1,97 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserProfile } from "@/contexts/UserProfileContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import ProfileButton from "@/components/layout/ProfileButton";
+import AdminMenu from "@/components/admin/AdminMenu";
 
-export default function SharedNavigation({ currentPage = "" }) {
-  const { user } = useAuth();
+export default function SharedNavigation() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const { profile } = useUserProfile();
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", active: currentPage === "dashboard" },
-    { href: "/play", label: "Play", active: currentPage === "play" },
-    { href: "/practice", label: "Practice", active: currentPage === "practice" },
-    { href: "/activities", label: "Activities", active: currentPage === "activities" },
-    { href: "/players", label: "Players", active: currentPage === "players" },
-    { href: "/me/stats", label: "Stats", active: currentPage === "stats" },
-    { href: "/profile", label: "Profile", active: currentPage === "profile" }
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/play", label: "Play" },
+    { href: "/practice", label: "Training" },
+    { href: "/activities", label: "Activities" },
+    { href: "/challenges", label: "Challenges" },
+    { href: "/players", label: "Players" },
+    { href: "/me/stats", label: "My Stats" },
   ];
 
+  const handleLogout = async () => {
+    const result = await logout();
+    if (result.success) {
+      router.push("/");
+    }
+  };
+
+  const isActive = (href) => {
+    if (href === "/dashboard" && pathname === "/dashboard") return true;
+    if (href !== "/dashboard" && pathname.startsWith(href)) return true;
+    return false;
+  };
+
   return (
-    <nav className="relative z-10 bg-black/20 backdrop-blur-lg border-b border-white/10">
+    <header className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-8">
-            <Link href={user ? "/dashboard" : "/"} className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
-                <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+          <div className="flex items-center">
+            <Link href={user ? "/dashboard" : "/"} className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
               </div>
-              <span className="font-bold text-xl text-white">Dartmaster</span>
+              <span className="font-semibold text-gray-900 text-lg">Dartmaster</span>
             </Link>
-            
-            {user && (
-              <div className="hidden md:flex space-x-4">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${
-                      item.active
-                        ? "text-white hover:text-red-400"
-                        : "text-gray-300 hover:text-white"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
+
+          {user && (
+            <nav className="hidden md:flex items-center space-x-8">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive(item.href)
+                      ? "text-gray-900 border-b-2 border-orange-500 pb-1"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          )}
 
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                {/* Notification Bell */}
                 <NotificationBell />
-                
-                {/* Profile Button */}
+                {profile?.isAdmin && <AdminMenu />}
                 <ProfileButton />
-                
-                {/* Mobile menu button - could be implemented later */}
-                <div className="md:hidden">
-                  {/* Mobile menu toggle would go here */}
-                </div>
+                <button 
+                  onClick={handleLogout} 
+                  className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                  Logout
+                </button>
               </>
             ) : (
               <div className="flex items-center space-x-3">
                 <Link 
                   href="/auth/login"
-                  className="px-4 py-2 bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 rounded-lg text-sm font-medium transition border border-gray-500/30"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium transition"
                 >
                   Sign In
                 </Link>
                 <Link 
                   href="/auth/register"
-                  className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm font-medium transition border border-red-500/30"
+                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition"
                 >
                   Get Started
                 </Link>
@@ -82,6 +100,6 @@ export default function SharedNavigation({ currentPage = "" }) {
           </div>
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

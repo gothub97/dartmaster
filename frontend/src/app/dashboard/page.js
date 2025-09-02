@@ -6,9 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/contexts/UserProfileContext";
 import { useFriends } from "@/contexts/FriendsContext";
-import ProfileButton from "@/components/layout/ProfileButton";
-import NotificationBell from "@/components/notifications/NotificationBell";
-import AdminMenu from "@/components/admin/AdminMenu";
+import SharedNavigation from "@/components/layout/SharedNavigation";
 import { useNotifications } from "@/contexts/NotificationContext";
 import ActivityCard from "@/components/activity/ActivityCard";
 import { useStats } from "@/hooks/useStats";
@@ -52,14 +50,18 @@ export default function DashboardPage() {
     if (profile?.objectives) {
       try {
         const parsed = JSON.parse(profile.objectives);
-        setObjectives({
-          weeklyGamesGoal: parsed.weeklyGamesGoal ?? 15,
-          accuracyTarget: parsed.accuracyTarget ?? 60,
-          doublesTarget: parsed.doublesTarget ?? 40,
-          practiceHoursGoal: parsed.practiceHoursGoal ?? 5
-        });
+        // Check if parsed is valid
+        if (parsed && typeof parsed === 'object') {
+          setObjectives({
+            weeklyGamesGoal: parsed?.weeklyGamesGoal ?? 15,
+            accuracyTarget: parsed?.accuracyTarget ?? 60,
+            doublesTarget: parsed?.doublesTarget ?? 40,
+            practiceHoursGoal: parsed?.practiceHoursGoal ?? 5
+          });
+        }
       } catch (e) {
         console.error('Error parsing objectives:', e);
+        // Keep default objectives on error
       }
     }
   }, [profile]);
@@ -97,6 +99,9 @@ export default function DashboardPage() {
       try {
         const friendProfiles = [];
         for (const friendId of friends.slice(0, 5)) {
+          // Skip if friendId is invalid
+          if (!friendId) continue;
+          
           try {
             const response = await databases.listDocuments(
               DATABASE_ID,
@@ -156,81 +161,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link href="/dashboard" className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="font-semibold text-gray-900 text-lg">Dartmaster</span>
-              </Link>
-            </div>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link 
-                href="/dashboard"
-                className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1"
-              >
-                Dashboard
-              </Link>
-              <Link 
-                href="/play"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Play
-              </Link>
-              <Link 
-                href="/practice"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Training
-              </Link>
-              <Link 
-                href="/activities"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Activities
-              </Link>
-              <Link 
-                href="/challenges"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Challenges
-              </Link>
-              <Link 
-                href="/me/stats"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Stats
-              </Link>
-              <Link 
-                href="/friends"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Friends
-              </Link>
-            </nav>
-
-            {/* Right side */}
-            <div className="flex items-center space-x-4">
-              {profile?.isAdmin && <AdminMenu />}
-              <NotificationBell />
-              <ProfileButton />
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SharedNavigation />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-5rem)]">
@@ -292,31 +223,31 @@ export default function DashboardPage() {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-500">Weekly Goal</span>
-                      <span className="font-medium text-gray-900">{stats.weeklyGames}/{objectives.weeklyGamesGoal} games</span>
+                      <span className="font-medium text-gray-900">{stats?.weeklyGames || 0}/{objectives?.weeklyGamesGoal || 15} games</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-orange-500" style={{ width: `${Math.min(100, (stats.weeklyGames / objectives.weeklyGamesGoal) * 100)}%` }}></div>
+                      <div className="h-full bg-orange-500" style={{ width: `${Math.min(100, ((stats?.weeklyGames || 0) / (objectives?.weeklyGamesGoal || 15)) * 100)}%` }}></div>
                     </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-500">Accuracy (Target: {objectives.accuracyTarget}%)</span>
-                      <span className="font-medium text-gray-900">{Math.round(stats.accuracy)}%</span>
+                      <span className="text-gray-500">Accuracy (Target: {objectives?.accuracyTarget || 60}%)</span>
+                      <span className="font-medium text-gray-900">{Math.round(stats?.accuracy || 0)}%</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-500" style={{ width: `${Math.min(100, (stats.accuracy / objectives.accuracyTarget) * 100)}%` }}></div>
+                      <div className="h-full bg-green-500" style={{ width: `${Math.min(100, ((stats?.accuracy || 0) / (objectives?.accuracyTarget || 60)) * 100)}%` }}></div>
                     </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-500">Doubles Hit Rate (Target: {objectives.doublesTarget}%)</span>
-                      <span className="font-medium text-gray-900">{Math.round(stats.doublesHit)}%</span>
+                      <span className="text-gray-500">Doubles Hit Rate (Target: {objectives?.doublesTarget || 40}%)</span>
+                      <span className="font-medium text-gray-900">{Math.round(stats?.doublesHit || 0)}%</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-500" style={{ width: `${Math.min(100, (stats.doublesHit / objectives.doublesTarget) * 100)}%` }}></div>
+                      <div className="h-full bg-blue-500" style={{ width: `${Math.min(100, ((stats?.doublesHit || 0) / (objectives?.doublesTarget || 40)) * 100)}%` }}></div>
                     </div>
                   </div>
-                  {stats.total180s > 0 && (
+                  {stats?.total180s > 0 && (
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span className="text-gray-500">180s This Month</span>
@@ -422,7 +353,7 @@ export default function DashboardPage() {
                       return (
                         <Link
                           key={challenge.$id} 
-                          href="/challenges"
+                          href={`/challenges/${challenge.$id}`}
                           className={`block p-3 rounded-lg transition-colors ${
                             status === 'active' 
                               ? 'bg-orange-50 border border-orange-200 hover:bg-orange-100' 

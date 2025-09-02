@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { databases } from "@/lib/appwrite";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -85,7 +86,9 @@ export default function ChallengeCard({ challenge, onJoin }) {
         <div className="flex items-center space-x-3">
           <div className="text-2xl">{getTypeIcon()}</div>
           <div>
-            <h3 className="font-semibold text-gray-900">{challenge.name}</h3>
+            <Link href={`/challenges/${challenge.$id}`} className="font-semibold text-gray-900 hover:text-orange-600 transition-colors">
+              {challenge.name}
+            </Link>
             <div className="flex items-center space-x-2 mt-1">
               <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor()}`}>
                 {status === "active" ? `${daysLeft} days left` : status}
@@ -152,31 +155,57 @@ export default function ChallengeCard({ challenge, onJoin }) {
               {isParticipant ? (
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-green-600 font-medium">✓ You're participating</span>
-                  <button className="text-sm text-orange-600 hover:text-orange-700 font-medium">
-                    View Leaderboard →
-                  </button>
+                  <Link 
+                    href={`/challenges/${challenge.$id}`}
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                  >
+                    View Details →
+                  </Link>
                 </div>
               ) : (
-                <button
-                  onClick={handleJoinChallenge}
-                  className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+                <Link
+                  href={`/challenges/${challenge.$id}`}
+                  className="block w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium text-center"
                 >
-                  Join Challenge
-                </button>
+                  View & Join Challenge
+                </Link>
               )}
             </div>
           )}
 
           {status === "upcoming" && (
-            <div className="text-center text-sm text-gray-500 py-2">
-              Challenge starts in {Math.ceil((startDate - now) / (1000 * 60 * 60 * 24))} days
+            <div className="pt-4">
+              {isParticipant ? (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-blue-600 font-medium">✓ Pre-registered</span>
+                  <Link 
+                    href={`/challenges/${challenge.$id}`}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    View Details →
+                  </Link>
+                </div>
+              ) : (
+                <Link
+                  href={`/challenges/${challenge.$id}`}
+                  className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-center"
+                >
+                  Pre-Register Now
+                </Link>
+              )}
+              <div className="text-center text-xs text-gray-500 mt-2">
+                Starts in {Math.ceil((startDate - now) / (1000 * 60 * 60 * 24))} days
+              </div>
             </div>
           )}
 
           {status === "ended" && (
-            <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            <Link 
+              href={`/challenges/${challenge.$id}`}
+              className="block w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-center"
+            >
               View Results
-            </button>
+            </Link>
           )}
         </div>
       )}

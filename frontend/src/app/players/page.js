@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useUserProfile } from "@/contexts/UserProfileContext";
 import { useAuth } from "@/contexts/AuthContext";
 import FriendButton from "@/components/social/FriendButton";
-import NotificationBell from "@/components/notifications/NotificationBell";
-import ProfileButton from "@/components/layout/ProfileButton";
+import SharedNavigation from "@/components/layout/SharedNavigation";
 
 export default function PlayersPage() {
   const { user } = useAuth();
@@ -69,68 +68,7 @@ export default function PlayersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <Link href={user ? "/dashboard" : "/"} className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="font-bold text-xl text-gray-900">Dartmaster</span>
-              </Link>
-              
-              {user && (
-                <nav className="hidden md:flex space-x-6">
-                  <Link href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                    Dashboard
-                  </Link>
-                  <Link href="/play" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                    Play
-                  </Link>
-                  <Link href="/practice" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                    Practice
-                  </Link>
-                  <Link href="/activities" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                    Activities
-                  </Link>
-                  <Link href="/me/stats" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                    Stats
-                  </Link>
-                  <Link href="/players" className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1">
-                    Players
-                  </Link>
-                </nav>
-              )}
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {user ? (
-                <>
-                  <NotificationBell />
-                  <ProfileButton />
-                </>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <Link 
-                    href="/auth/login"
-                    className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition"
-                  >
-                    Sign In
-                  </Link>
-                  <Link 
-                    href="/auth/register"
-                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <SharedNavigation />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

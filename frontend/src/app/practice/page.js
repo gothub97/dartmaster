@@ -7,13 +7,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/contexts/UserProfileContext";
 import { usePractice } from "@/contexts/PracticeContext";
 import VirtualDartboard from "@/components/game/VirtualDartboard";
-import ProfileButton from "@/components/layout/ProfileButton";
-import NotificationBell from "@/components/notifications/NotificationBell";
+import SharedNavigation from "@/components/layout/SharedNavigation";
 import { PracticeIcon } from "@/components/icons/PracticeIcons";
 
 export default function PracticePage() {
   const router = useRouter();
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useUserProfile();
   const {
     currentSession,
@@ -225,53 +224,7 @@ export default function PracticePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/dashboard" className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="font-semibold text-gray-900 text-lg">Dartmaster</span>
-              </Link>
-            </div>
-
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Dashboard
-              </Link>
-              <Link href="/play" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Play
-              </Link>
-              <Link href="/practice" className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1">
-                Training
-              </Link>
-              <Link href="/activities" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Activities
-              </Link>
-              <Link href="/me/stats" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Stats
-              </Link>
-              <Link href="/friends" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Friends
-              </Link>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <NotificationBell />
-              <ProfileButton />
-              <button
-                onClick={logout}
-                className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SharedNavigation />
 
       {/* Main Content */}
       {showModeSelection ? (

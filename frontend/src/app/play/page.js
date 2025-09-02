@@ -6,8 +6,7 @@ import Link from "next/link";
 import VirtualDartboard from "@/components/game/VirtualDartboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGame } from "@/contexts/GameContextV2";
-import NotificationBell from "@/components/notifications/NotificationBell";
-import ProfileButton from "@/components/layout/ProfileButton";
+import SharedNavigation from "@/components/layout/SharedNavigation";
 import AimPicker from "@/components/game/AimPicker";
 
 export default function PlayPage() {
@@ -142,50 +141,7 @@ export default function PlayPage() {
   if (showGameSetup) {
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center">
-                <Link href="/dashboard" className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                  <span className="font-semibold text-gray-900 text-lg">Dartmaster</span>
-                </Link>
-              </div>
-              
-              <nav className="hidden md:flex items-center space-x-8">
-                <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  Dashboard
-                </Link>
-                <Link href="/play" className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1">
-                  Play
-                </Link>
-                <Link href="/practice" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  Training
-                </Link>
-                <Link href="/activities" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  Activities
-                </Link>
-                <Link href="/me/stats" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  Stats
-                </Link>
-                <Link href="/players" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  Players
-                </Link>
-                <Link href="/profile" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                  Profile
-                </Link>
-              </nav>
-
-              <div className="flex items-center space-x-4">
-                <NotificationBell />
-                <ProfileButton />
-              </div>
-            </div>
-          </div>
-        </header>
+        <SharedNavigation />
 
         {/* Game Setup */}
         <div className="flex items-center justify-center px-4 py-12">
@@ -312,27 +268,20 @@ export default function PlayPage() {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <SharedNavigation />
+      
+      {/* Game Header */}
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-6">
-              <Link href="/dashboard" className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="font-semibold text-gray-900 text-lg">Dartmaster</span>
-              </Link>
-              
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  {GAME_MODES[currentMatch?.mode || "501"].name}
-                </h1>
-                <span className="px-2 py-1 bg-gray-100 rounded text-sm text-gray-600">
-                  Round {currentMatch?.currentRound || 1}
-                </span>
-              </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <h1 className="text-lg font-semibold text-gray-900">
+                {GAME_MODES[currentMatch?.mode || "501"].name}
+              </h1>
+              <span className="px-2 py-1 bg-gray-100 rounded text-sm text-gray-600">
+                Round {currentMatch?.currentRound || 1}
+              </span>
             </div>
             
             <div className="flex items-center space-x-3">
@@ -355,7 +304,7 @@ export default function PlayPage() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Current Throws Display */}

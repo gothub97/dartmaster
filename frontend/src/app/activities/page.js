@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { databases } from "@/lib/appwrite";
 import { Query } from "appwrite";
+import SharedNavigation from "@/components/layout/SharedNavigation";
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
 
 export default function ActivitiesPage() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [matches, setMatches] = useState([]);
   const [practiceSession, setPracticeSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -250,49 +251,7 @@ export default function ActivitiesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/dashboard" className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="font-semibold text-gray-900 text-lg">Dartmaster</span>
-              </Link>
-            </div>
-
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Dashboard
-              </Link>
-              <Link href="/play" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Play
-              </Link>
-              <Link href="/practice" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Training
-              </Link>
-              <Link href="/activities" className="text-sm font-medium text-gray-900 border-b-2 border-orange-500 pb-1">
-                Activities
-              </Link>
-              <Link href="/me/stats" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Stats
-              </Link>
-              <Link href="/friends" className="text-sm font-medium text-gray-500 hover:text-gray-900">
-                Friends
-              </Link>
-            </nav>
-
-            <button
-              onClick={logout}
-              className="text-sm text-gray-500 hover:text-gray-900"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
+      <SharedNavigation />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
