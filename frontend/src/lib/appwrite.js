@@ -1,4 +1,4 @@
-import { Client, Account, Databases, Storage } from "appwrite";
+import { Client, Account, Databases, Storage, Teams } from "appwrite";
 
 const client = new Client();
 
@@ -12,5 +12,6 @@ if (process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT && process.env.NEXT_PUBLIC_APPWRIT
 const account = new Account(client);
 const databases = new Databases(client);
 const storage = new Storage(client);
+const teams = new Teams(client);
 
-export { client, account, databases, storage };
+export { client, account, databases, storage, teams };

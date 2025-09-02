@@ -18,6 +18,7 @@ export default function SharedNavigation() {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/play", label: "Play" },
     { href: "/practice", label: "Training" },
+    { href: "/clubs", label: "Clubs" },
     { href: "/activities", label: "Activities" },
     { href: "/challenges", label: "Challenges" },
     { href: "/players", label: "Players" },

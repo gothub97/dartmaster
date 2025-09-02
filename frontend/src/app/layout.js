@@ -7,6 +7,7 @@ import { PracticeProvider } from "@/contexts/PracticeContext";
 import { UserProfileProvider } from "@/contexts/UserProfileContext";
 import { FriendsProvider } from "@/contexts/FriendsContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { ClubProvider } from "@/contexts/ClubContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -25,11 +26,13 @@ export default function RootLayout({ children }) {
           <UserProfileProvider>
             <FriendsProvider>
               <NotificationProvider>
-                <GameProvider>
-                  <PracticeProvider>
-                    {children}
-                  </PracticeProvider>
-                </GameProvider>
+                <ClubProvider>
+                  <GameProvider>
+                    <PracticeProvider>
+                      {children}
+                    </PracticeProvider>
+                  </GameProvider>
+                </ClubProvider>
               </NotificationProvider>
             </FriendsProvider>
           </UserProfileProvider>
